@@ -1,0 +1,13 @@
+message Input {
+  required int8 buttons = 1;
+}
+
+message NetMsg {
+  enum Type {
+	INPUT = 0;
+  }
+
+  required Type type = 1;
+  optional Input input = 2;
+}
+
