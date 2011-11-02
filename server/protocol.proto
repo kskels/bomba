@@ -1,13 +1,28 @@
-message Input {
-  required int8 buttons = 1;
+message PositionUpdate {
+  required int32 entity = 1;
+  required int32 x = 2;
+  required int32 y = 3;
+}
+
+message MapData {
+  enum Tile {
+	SOLID = 0;
+	EMPTY = 1;
+  }
+
+  required string name = 1;
+  required int32 width = 2;
+  repeated Tile tiles = 3;
 }
 
 message NetMsg {
   enum Type {
-	INPUT = 0;
+	POSITION_UPDATE = 0;
+	MAP_DATA = 1;
   }
 
   required Type type = 1;
-  optional Input input = 2;
+  optional PositionUpdate player_position = 2;
+  optional MapData map = 3;
 }
 
