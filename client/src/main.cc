@@ -15,7 +15,8 @@ int main() {
   params.WithAlphaChannel = true;
   params.DeviceType = EIDT_BEST;
   params.DriverType = video::EDT_OPENGL;
-  params.WindowSize = core::dimension2d<u32>(WIDTH,HEIGHT);
+  params.WindowSize = core::dimension2d<u32>(WIDTH,HEIGHT
+);
   params.Doublebuffer = true;
   params.Bits = 32;
   params.ZBufferBits = 16;
@@ -27,6 +28,9 @@ int main() {
   device->setWindowCaption(capt.c_str());
 
   while(device->run()) {
+    irr::video::IVideoDriver* pDriver = device->getVideoDriver();
+    pDriver->beginScene(true, true, video::SColor(255,100,101,140));
+    pDriver->endScene();
   }
 
   device.release()->drop();
