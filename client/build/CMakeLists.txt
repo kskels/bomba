@@ -13,6 +13,6 @@ find_package(Irrlicht)
 add_subdirectory(${PROJECT_ROOT_DIR}/src CMakeFiles/src)
 
 add_custom_target(clean-gen
-    rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile
+    rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile ${PROJECT_ROOT_DIR}/bin
   )
 
