@@ -9,6 +9,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_ROOT_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT_DIR}/bin)
 
 find_package(Irrlicht)
+find_package(Protobuf)
 
 add_subdirectory(${PROJECT_ROOT_DIR}/src CMakeFiles/src)
 

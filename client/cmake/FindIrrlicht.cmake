@@ -12,6 +12,8 @@ FIND_LIBRARY(IRRLICHT_LIB Irrlicht
 IF(NOT IRRLICHT_INC_DIR OR NOT IRRLICHT_LIB)
     message(SEND_ERROR "Irrlicht could not be found")
 ELSE(NOT IRRLICHT_INC_DIR OR NOT IRRLICHT_LIB)
-    message(STATUS "Irrlicht found: ${IRRLICHT_INC_DIR} ${IRRLICHT_LIB}")
+    message(STATUS "Irrlicht found: 
+        ${IRRLICHT_INC_DIR}/irrlicht/irrlicht.h 
+        ${IRRLICHT_LIB}")
 ENDIF(NOT IRRLICHT_INC_DIR OR NOT IRRLICHT_LIB)
 
