@@ -7,3 +7,5 @@ Makefile
 *.swp
 bin
 
+protocol.pb.cc
+protocol.pb.h

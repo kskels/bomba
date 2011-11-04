@@ -9,5 +9,8 @@ add_executable(bomba
 
 target_link_libraries(bomba
     ${IRRLICHT_LIB}
+    bomba_protobuf
   )
+
+add_subdirectory(protobuf)
 
