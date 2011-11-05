@@ -13,9 +13,9 @@ class NetMsg;
 class Connection {
 public:
   enum {
-	DISCONNECTED,
-	CONNECTING,
-	CONNECTED,
+    DISCONNECTED,
+    CONNECTING,
+    CONNECTED,
   };
 	
   void connect(const std::string &address, int port = 14242) {}
