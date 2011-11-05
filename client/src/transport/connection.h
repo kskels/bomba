@@ -12,7 +12,7 @@ class NetMsg;
  */ 
 class Connection {
 public:
-  enum {
+  enum State {
     DISCONNECTED,
     CONNECTING,
     CONNECTED,
@@ -27,7 +27,9 @@ public:
    * @return a pointer to the NetMsg received, or 0 if
    *         there's not enough data to construct a message.
    */	 
-  NetMsg *receive(NetMsg &) {}
+  NetMsg *receive(NetMsg &) const;
+
+  State state() const;
 };
 
 #endif // !BOMBA_CONNECTION_H
