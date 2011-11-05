@@ -11,9 +11,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT_DIR}/bin)
 find_package(Irrlicht)
 find_package(Protobuf)
 
-add_subdirectory(${PROJECT_ROOT_DIR}/src CMakeFiles/src)
 
 add_custom_target(clean-gen
     rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile ${PROJECT_ROOT_DIR}/bin
   )
+
+add_subdirectory(${PROJECT_ROOT_DIR}/src CMakeFiles/src)
 
