@@ -13,4 +13,5 @@ target_link_libraries(bomba
   )
 
 add_subdirectory(protobuf)
+add_subdirectory(transport)
 
