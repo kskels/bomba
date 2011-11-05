@@ -12,7 +12,7 @@ int main() {
 
   using core::dimension2d;
   
-  SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
+  SIrrlichtCreationParameters params;
   params.AntiAlias = true;
   params.WithAlphaChannel = true;
   params.DeviceType = EIDT_BEST;
@@ -23,9 +23,8 @@ int main() {
   params.ZBufferBits = 16;
   params.Fullscreen = false;
   params.Vsync = params.Fullscreen;
-  
-  std::auto_ptr<IrrlichtDevice> device(
-    createDevice(video::EDT_OPENGL, dimension2d<u32>(640, 480), 16, false, false, false, 0));
+
+  std::auto_ptr<IrrlichtDevice> device(createDeviceEx(params));
   
   std::wstring capt = L"Bomba - ver: 0.0.1b ";
   device->setWindowCaption(capt.c_str());
