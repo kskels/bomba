@@ -12,14 +12,11 @@ add_library(bomba_protobuf
     protocol.pb.cc
   )
 
-# regenerate protocol every make-time
-add_custom_target(gen_protobuf
+# regenerate protocol before every target build
+add_custom_command(TARGET bomba_protobuf PRE_BUILD
     COMMAND ${PROTOC_TOOL} 
       --cpp_out=../client/src/protobuf protocol.proto 
       WORKING_DIRECTORY ${PROJECT_ROOT_DIR}/../server
-  )
-add_dependencies(bomba_protobuf
-    gen_protobuf
   )
 
 # add clean-up to the clean-gen
