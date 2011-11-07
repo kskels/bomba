@@ -4,8 +4,9 @@
 #define BOMBA_CONNECTION_H
 
 #include <vector>
+#include <string>
 
-class NetMsg;
+class NetMessage;
 
 /**
  * All operations are nonblocking.
@@ -18,16 +19,16 @@ public:
     CONNECTED,
   };
 	
-  void connect(const std::string &address, int port = 14242) {}
-  void disconnect() {}
-  void send(const NetMsg &) {}
+  void connect(const std::string &address, unsigned port = 14242);
+  void disconnect();
+  void send(const NetMessage &);
 
   /**
    * Reads the next incoming message.
-   * @return a pointer to the NetMsg received, or 0 if
+   * @return a pointer to the NetMessage received, or 0 if
    *         there's not enough data to construct a message.
    */	 
-  NetMsg *receive(NetMsg &) const;
+  NetMessage *receive(NetMessage &) const;
 
   State state() const;
 };

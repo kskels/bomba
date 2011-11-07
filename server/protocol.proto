@@ -15,7 +15,7 @@ message MapData {
   repeated Tile tiles = 3;
 }
 
-message NetMsg {
+message NetMessage {
   enum Type {
 	POSITION_UPDATE = 0;
 	MAP_DATA = 1;
