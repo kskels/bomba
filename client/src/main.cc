@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <iostream>
+#include <sstream>
 
 using namespace irr;
 
@@ -31,8 +32,11 @@ int main() {
 
   std::auto_ptr<IrrlichtDevice> device(createDeviceEx(params));
   
-  // TODO: Fix this to use new version defines from config.h
-  std::wstring capt = L"Bomba - ver: 0.0.1b ";
+  std::string title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." + 
+    + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
+  std::wstring capt;
+  capt.assign(title.begin(), title.end());
+
   device->setWindowCaption(capt.c_str());
 
   while(device->run()) {
@@ -42,5 +46,4 @@ int main() {
   }
 
   device.release()->drop();
-
 }

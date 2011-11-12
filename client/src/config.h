@@ -3,7 +3,7 @@
 
 #define BUILD_VERSION_MAJOR "0"
 #define BUILD_VERSION_MINOR "1"
-#define BUILD_VERSION_REVISION "fbe77bd"
+#define BUILD_VERSION_REVISION "8e5e394"
 
 #endif // !CONFIG_H
 
