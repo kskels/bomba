@@ -11,6 +11,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT_DIR}/bin)
 find_package(Irrlicht REQUIRED)
 find_package(Protobuf REQUIRED)
 
+include(Utils)
+
+configure_file(config.h.in ${PROJECT_ROOT_DIR}/src/config.h)
+
 add_custom_target(clean-gen
     rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile ${PROJECT_ROOT_DIR}/bin
   )

@@ -1,6 +1,7 @@
 
 include_directories(
     ${IRRLICHT_INC_DIR}
+    ${PROJECT_ROOT_DIR}/src
   )
 
 add_executable(bomba

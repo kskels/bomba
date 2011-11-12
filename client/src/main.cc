@@ -1,8 +1,13 @@
-#include <iostream>
+
+#include <config.h>
+
 #include <irrlicht/irrlicht.h>
+
 #include <memory>
+#include <iostream>
 
 using namespace irr;
+
 
 const int WIDTH = 320;
 const int HEIGHT = 240;
@@ -26,6 +31,7 @@ int main() {
 
   std::auto_ptr<IrrlichtDevice> device(createDeviceEx(params));
   
+  // TODO: Fix this to use new version defines from config.h
   std::wstring capt = L"Bomba - ver: 0.0.1b ";
   device->setWindowCaption(capt.c_str());
 
