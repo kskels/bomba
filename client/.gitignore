@@ -6,7 +6,7 @@ Makefile
 
 *.swp
 *.swo
-bin
+bin/bomba
 
 protocol.pb.cc
 protocol.pb.h
