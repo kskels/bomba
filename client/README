@@ -1,4 +1,3 @@
-
 Bomba Client
 ============
 
@@ -20,7 +19,7 @@ For Ubuntu Linux the standard repositories does contain required packages
 Build
 -----
 
-For reasonable distributions use CMake with default options
+For Linux distributions use CMake with default options
   $ cd build && cmake . && make
 
 For Windows it's preferred to use CMake to generate MS Visual Studio project 
