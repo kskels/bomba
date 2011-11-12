@@ -9,7 +9,7 @@ Development Environment
 The client is implemented in the C++ programming language using, CMake as a
 build, and Git as a version control systems. They are required prerequisites.
 
-The game depends on following tools and libraries
+The game depends on the following tools and libraries
   * Irrlicht 3D Game Engine 
   * Google Protocol Buffers
 
