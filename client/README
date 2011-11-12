@@ -20,8 +20,11 @@ For Ubuntu Linux the standard repositories does contain required packages
 Build
 -----
 
-Use CMake and Make in order to build the source code
+For reasonable distributions use CMake with default options
   $ cd build && cmake . && make
+
+For Windows it's preferred to use CMake to generate MS Visual Studio project 
+  $ cd build && cmake -G "Visual Studio 10"
 
 The binaries will end-up in bin
 
