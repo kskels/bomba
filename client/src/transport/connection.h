@@ -19,18 +19,18 @@ public:
     CONNECTED,
   };
 	
-  void connect(const std::string &address, unsigned port = 14242);
-  void disconnect();
-  void send(const NetMessage &);
+  void connect(const std::string &address, unsigned port = 14242) {};
+  void disconnect() {};
+  void send(const NetMessage &) {};
 
   /**
    * Reads the next incoming message.
    * @return a pointer to the NetMessage received, or 0 if
    *         there's not enough data to construct a message.
    */	 
-  NetMessage *receive(NetMessage &) const;
+  NetMessage *receive(NetMessage &) const {};
 
-  State state() const;
+  State state() const {};
 };
 
 #endif // !BOMBA_CONNECTION_H
