@@ -4,6 +4,10 @@ include_directories(
     ${PROJECT_ROOT_DIR}/src/transport
   )
 
+add_library(bomba_transport
+    connection.cpp
+  )
+
 IF(GTEST_FOUND)
 add_executable(connection_test EXCLUDE_FROM_ALL
     connection.cpp

@@ -18,8 +18,8 @@ const int WIDTH = 320;
 const int HEIGHT = 240;
 
 int main() {
-  Connection connection;
-  connection.connect("10.66.46.243");
+  //Connection connection;
+  //connection.connect("10.66.46.243");
 
   std::cout << "\\Weeeeee/" << std::endl;
 

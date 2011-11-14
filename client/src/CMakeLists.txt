@@ -12,9 +12,10 @@ add_executable(bomba
   )
 
 target_link_libraries(bomba
+    bomba_protobuf
+    bomba_transport
     ${IRRLICHT_LIB}
     ${PROTOBUF_LIB}
-    bomba_protobuf
   )
 
 
