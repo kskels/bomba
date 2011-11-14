@@ -2,9 +2,11 @@
 include_directories(
     ${IRRLICHT_INC_DIR}
     ${PROJECT_ROOT_DIR}/src
+    ${PROJECT_ROOT_DIR}/src/transport
   )
 
 add_executable(bomba
+    transport/connection.cpp
     main.cc   
   )
 
