@@ -6,6 +6,9 @@ include_directories(
   )
 
 add_executable(bomba
+    main.cc
+    EventReceiver.cpp
+    Bomba.cpp
     transport/connection.cpp
     main.cc   
   )

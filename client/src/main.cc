@@ -4,6 +4,9 @@
 
 #include <irrlicht/irrlicht.h>
 
+#include "Bomba.h"
+#include "EventReceiver.h"
+
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -35,6 +38,9 @@ int main() {
   params.Vsync = params.Fullscreen;
 
   std::auto_ptr<IrrlichtDevice> device(createDeviceEx(params));
+
+  EventReceiver receiver(device.get());
+  device->setEventReceiver(&receiver);
   
   std::string title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." + 
     + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
@@ -43,9 +49,14 @@ int main() {
 
   device->setWindowCaption(capt.c_str());
 
+  Bomba game(device.get());
+
   while(device->run()) {
     irr::video::IVideoDriver* pDriver = device->getVideoDriver();
     pDriver->beginScene(true, true, video::SColor(255,100,101,140));
+    game.update();
+    game.render();
+    device->getSceneManager()->drawAll();
     pDriver->endScene();
   }
 
