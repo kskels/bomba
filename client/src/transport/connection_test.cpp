@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <errno.h>
 
 
 static const unsigned _port = 14242; 
@@ -16,17 +17,25 @@ bool _accepted = false;
 struct Server {
   static void* run(void *args) {
     try {
+
       int sockfd = socket(AF_INET, SOCK_STREAM, 0);
       if (sockfd < 0)
         throw std::string("Failed to open socket");
+
+      int optval = 1;
+      setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
       struct sockaddr_in serv_addr;
       bzero((char *) &serv_addr, sizeof(serv_addr));
       serv_addr.sin_family = AF_INET;
       serv_addr.sin_addr.s_addr = INADDR_ANY;
       serv_addr.sin_port = htons(_port);
-      if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-        throw std::string("Failed to bind");
+      if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+        if (errno == EADDRINUSE) 
+          throw std::string("Failed to bind, address already in use");
+        else 
+          throw std::string("Failed to bind");
+      }
 
       listen(sockfd, 5);
 
@@ -41,7 +50,8 @@ struct Server {
       _accepted = true;
 
       while(_run);
-
+    
+      close(newsockfd);
       close(sockfd);
     } catch (const std::string& error) {
         std::cout << "Error: " << error << std::endl;
@@ -77,18 +87,18 @@ private:
   Server _server;
 };
 
-//TEST_F(ConnectionTest, TestConnection) {
-  //Connection connection;
-  //EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
+TEST_F(ConnectionTest, TestConnection) {
+  Connection connection;
+  EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
 
-  //_accepted = false;
-  //EXPECT_NO_THROW(connection.connect("localhost", _port));
-  //EXPECT_EQ(connection.state(), Connection::CONNECTED);
-  //EXPECT_TRUE(_accepted);
+  _accepted = false;
+  EXPECT_NO_THROW(connection.connect("localhost", _port));
+  EXPECT_EQ(connection.state(), Connection::CONNECTED);
+  while(!_accepted);
 
-  //EXPECT_NO_THROW(connection.disconnect());
-  //EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
-//}
+  EXPECT_NO_THROW(connection.disconnect());
+  EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
+}
 
 TEST_F(ConnectionTest, TestSend) {
   Connection connection;
