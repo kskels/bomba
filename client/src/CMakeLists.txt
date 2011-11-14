@@ -6,12 +6,9 @@ include_directories(
     ${PROJECT_ROOT_DIR}/src/protobuf
   )
 
+FILE(GLOB BOMBA_SOURCE_FILES "*.cpp")
 add_executable(bomba
-    main.cc
-    EventReceiver.cpp
-    Bomba.cpp
-    transport/connection.cpp
-    main.cc   
+    ${BOMBA_SOURCE_FILES}
   )
 
 target_link_libraries(bomba
