@@ -103,6 +103,5 @@ TEST_F(ConnectionTest, TestSend) {
   //NetMessage message;
   //message.MergeFrom(position);
   //EXPECT_NO_THROW(connection.send(message));  
-
 }
 
