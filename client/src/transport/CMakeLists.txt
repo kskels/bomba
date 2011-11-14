@@ -6,6 +6,7 @@ include_directories(
 
 IF(GTEST_FOUND)
 add_executable(connection_test EXCLUDE_FROM_ALL
+    ../protobuf/protocol.pb.cc
     connection.cpp
     connection_test.cpp
   )

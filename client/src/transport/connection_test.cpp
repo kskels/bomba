@@ -1,5 +1,7 @@
 
 #include <connection.h>
+#include <protocol.pb.h>
+
 #include <gtest/gtest.h>
 
 #include <pthread.h>
@@ -9,6 +11,7 @@
 
 
 static const unsigned _port = 14242; 
+bool _accepted = false;
 
 struct Server {
   static void* run(void *args) {
@@ -35,7 +38,7 @@ struct Server {
       newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &clilen);
       if (newsockfd < 0)
         throw std::string("Failed to accept"); 
-      std::cout << "Got connection.." << std::endl;
+      _accepted = true;
 
       while(_run);
 
@@ -54,10 +57,7 @@ struct Server {
   };
   void stop() {
     _run = false;
-    // probably good idea to fix this nicer
-    // also, the clean-up might be needed
-    pthread_kill(_thread, 0);
-    //pthread_join(_thread, 0);
+    pthread_join(_thread, 0);
   };
   static bool _run;
   static bool _ready;
@@ -77,15 +77,32 @@ private:
   Server _server;
 };
 
-TEST_F(ConnectionTest, TestConnection)
-{
-  Connection connection;
-  EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
+//TEST_F(ConnectionTest, TestConnection) {
+  //Connection connection;
+  //EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
 
+  //_accepted = false;
+  //EXPECT_NO_THROW(connection.connect("localhost", _port));
+  //EXPECT_EQ(connection.state(), Connection::CONNECTED);
+  //EXPECT_TRUE(_accepted);
+
+  //EXPECT_NO_THROW(connection.disconnect());
+  //EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
+//}
+
+TEST_F(ConnectionTest, TestSend) {
+  Connection connection;
   EXPECT_NO_THROW(connection.connect("localhost", _port));
   EXPECT_EQ(connection.state(), Connection::CONNECTED);
 
-  EXPECT_NO_THROW(connection.disconnect());
-  EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
+  PositionUpdate position;
+  position.set_entity(11);
+  position.set_x(22);
+  position.set_y(33); 
+
+  //NetMessage message;
+  //message.MergeFrom(position);
+  //EXPECT_NO_THROW(connection.send(message));  
+
 }
 
