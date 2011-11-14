@@ -6,11 +6,11 @@ include_directories(
 
 IF(GTEST_FOUND)
 add_executable(connection_test EXCLUDE_FROM_ALL
-    ../protobuf/protocol.pb.cc
     connection.cpp
     connection_test.cpp
   )
 target_link_libraries(connection_test
+    bomba_protobuf
     ${GTEST_MAIN_LIB}
     ${GTEST_LIB}
     ${PROTOBUF_LIB}

@@ -3,6 +3,7 @@ include_directories(
     ${IRRLICHT_INC_DIR}
     ${PROJECT_ROOT_DIR}/src
     ${PROJECT_ROOT_DIR}/src/transport
+    ${PROJECT_ROOT_DIR}/src/protobuf
   )
 
 add_executable(bomba
@@ -15,6 +16,7 @@ add_executable(bomba
 
 target_link_libraries(bomba
     ${IRRLICHT_LIB}
+    ${PROTOBUF_LIB}
     bomba_protobuf
   )
 

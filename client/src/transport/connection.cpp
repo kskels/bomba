@@ -1,6 +1,6 @@
 
-#include <protocol.pb.h>
 #include <connection.h>
+#include <protocol.pb.h>
 
 #include <iostream>
 #include <sstream>
