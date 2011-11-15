@@ -5,7 +5,9 @@ include_directories(
   )
 
 add_executable(bomba
-    main.cc   
+    main.cc
+    EventReceiver.cpp
+    Bomba.cpp
   )
 
 target_link_libraries(bomba
