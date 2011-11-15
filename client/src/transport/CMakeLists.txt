@@ -6,6 +6,7 @@ include_directories(
 
 IF(GTEST_FOUND)
 add_executable(connection_test EXCLUDE_FROM_ALL
+    connection.cpp
     connection_test.cpp
   )
 target_link_libraries(connection_test

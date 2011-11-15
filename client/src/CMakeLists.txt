@@ -2,12 +2,15 @@
 include_directories(
     ${IRRLICHT_INC_DIR}
     ${PROJECT_ROOT_DIR}/src
+    ${PROJECT_ROOT_DIR}/src/transport
   )
 
 add_executable(bomba
     main.cc
     EventReceiver.cpp
     Bomba.cpp
+    transport/connection.cpp
+    main.cc   
   )
 
 target_link_libraries(bomba

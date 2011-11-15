@@ -19,8 +19,8 @@ public:
     CONNECTED,
   };
 	
-  void connect(const std::string &address, unsigned port = 14242) {};
-  void disconnect() {};
+  void connect(const std::string &address, unsigned port = 14242);
+  void disconnect();
   void send(const NetMessage &) {};
 
   /**
@@ -31,6 +31,10 @@ public:
   NetMessage *receive(NetMessage &) const {};
 
   State state() const {};
+
+private:
+  int _sockfd;
+
 };
 
 #endif // !BOMBA_CONNECTION_H

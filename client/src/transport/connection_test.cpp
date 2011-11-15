@@ -25,12 +25,21 @@ struct Server {
       if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
         throw std::string("Failed to bind");
 
-      _ready = true;
-      while(_run) {
-        // do select here.. 
-      }
-      close(sockfd);
+      listen(sockfd, 5);
 
+      _ready = true;
+      struct sockaddr_in cli_addr;
+      socklen_t clilen; 
+      int newsockfd;
+      clilen = sizeof(cli_addr);
+      newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &clilen);
+      if (newsockfd < 0)
+        throw std::string("Failed to accept"); 
+      std::cout << "Got connection.." << std::endl;
+
+      while(_run);
+
+      close(sockfd);
     } catch (const std::string& error) {
         std::cout << "Error: " << error << std::endl;
         throw error;
@@ -45,7 +54,10 @@ struct Server {
   };
   void stop() {
     _run = false;
-    pthread_join(_thread, 0);
+    // probably good idea to fix this nicer
+    // also, the clean-up might be needed
+    pthread_kill(_thread, 0);
+    //pthread_join(_thread, 0);
   };
   static bool _run;
   static bool _ready;
