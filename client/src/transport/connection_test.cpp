@@ -13,11 +13,14 @@
 
 static const unsigned _port = 14242; 
 bool _accepted = false;
+bool _received = false;
+NetMessage _message;
+
+std::string _got;
 
 struct Server {
   static void* run(void *args) {
     try {
-
       int sockfd = socket(AF_INET, SOCK_STREAM, 0);
       if (sockfd < 0)
         throw std::string("Failed to open socket");
@@ -45,12 +48,51 @@ struct Server {
       int newsockfd;
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &clilen);
+      std::cout << "newsockfd: " << newsockfd << std::endl;
       if (newsockfd < 0)
         throw std::string("Failed to accept"); 
       _accepted = true;
 
-      while(_run);
-    
+      struct timeval tv;
+      tv.tv_sec = 1;
+      tv.tv_usec = 1000;
+
+      fd_set master, read_fds;
+      FD_ZERO(&master);
+      FD_ZERO(&read_fds);
+
+      FD_SET(sockfd, &master);
+      int fdmax = sockfd;
+      std::cout << "sockfd: " << fdmax << std::endl;
+
+      FD_SET(newsockfd, &master);
+      if (newsockfd > fdmax)
+        fdmax = newsockfd;
+
+      while(_run) {
+        read_fds = master;
+        if (select(fdmax+1, &read_fds, NULL, NULL, &tv) == -1)
+            throw std::string("Failed to select");
+
+        for (int i(0); i != fdmax+1; ++i) {
+        if (FD_ISSET(i, &read_fds) && i != sockfd) {
+          std::cout << "got something: " << i << std::endl;
+          char buffer[256];
+          bzero(buffer, 256);
+          int n = read(newsockfd, buffer, 255);
+          std::cout << "got byets: " << n << std::endl;
+          std::stringstream ss;
+          for (int j(0); j != n; ++j) {
+            std::cout << "." << std::endl;
+            ss << buffer[j];
+          }
+          _got = ss.str();
+          _message.ParseFromIstream(&ss);
+          _received = true;
+        }
+        }
+      }    
+
       close(newsockfd);
       close(sockfd);
     } catch (const std::string& error) {
@@ -110,8 +152,27 @@ TEST_F(ConnectionTest, TestSend) {
   position.set_x(22);
   position.set_y(33); 
 
-  //NetMessage message;
-  //message.MergeFrom(position);
-  //EXPECT_NO_THROW(connection.send(message));  
+  NetMessage message;
+  message.set_type(NetMessage::POSITION_UPDATE);
+  *(message.mutable_player_position()) = position;
+
+  EXPECT_TRUE(message.has_player_position());
+
+  std::stringstream ss;
+  message.SerializeToOstream(&ss);
+  std::string sent = ss.str();
+    
+  _received = false;
+  EXPECT_NO_THROW(connection.send(message));  
+
+  while(!_received);
+
+  EXPECT_EQ(sent, _got);
+
+  EXPECT_EQ(_message.type(), NetMessage::POSITION_UPDATE);
+  EXPECT_TRUE(_message.has_player_position());
+  EXPECT_FALSE(_message.has_map());
+  EXPECT_EQ(_message.player_position().entity(), 11);
+
 }
 
