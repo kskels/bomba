@@ -46,9 +46,17 @@ void Connection::disconnect() {
 void Connection::send(const NetMessage &message) {
   std::stringstream ss;
   message.SerializeToOstream(&ss);
-  int n = ::write(_sockfd, ss.str().c_str(), ss.str().size());
+
+  std::stringstream size;
+  size << ss.str().size();
+
+  int n = ::write(_sockfd, size.str().c_str(), sizeof(int16_t));
+  if (n < 0)
+    throw std::string("Failed to write size into the socket");
+
+  n = ::write(_sockfd, ss.str().c_str(), ss.str().size());
   if (n < 0) 
-    throw std::string("Failed to write socket"); 
+    throw std::string("Failed to write data into the socket"); 
   std::cout << "Sent " << n << " bytes =]" << std::endl;
 }
 

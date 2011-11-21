@@ -54,7 +54,7 @@ struct Server {
       _accepted = true;
 
       struct timeval tv;
-      tv.tv_sec = 1;
+      tv.tv_sec = 0;
       tv.tv_usec = 1000;
 
       fd_set master, read_fds;
@@ -79,7 +79,13 @@ struct Server {
           std::cout << "got something: " << i << std::endl;
           char buffer[256];
           bzero(buffer, 256);
-          int n = read(newsockfd, buffer, 255);
+          int n = read(newsockfd, buffer, 2);
+
+          int16_t wait = atoi(buffer);
+          std::cout << "Got size: " << wait << std::endl;
+
+          bzero(buffer, 256);
+          n = read(newsockfd, buffer, wait);
           std::cout << "got byets: " << n << std::endl;
           std::stringstream ss;
           for (int j(0); j != n; ++j) {
@@ -143,6 +149,9 @@ TEST_F(ConnectionTest, TestConnection) {
 }
 
 TEST_F(ConnectionTest, TestSend) {
+
+  std::cout << sizeof(int16_t) << std::endl;
+
   Connection connection;
   EXPECT_NO_THROW(connection.connect("localhost", _port));
   EXPECT_EQ(connection.state(), Connection::CONNECTED);
@@ -173,6 +182,5 @@ TEST_F(ConnectionTest, TestSend) {
   EXPECT_TRUE(_message.has_player_position());
   EXPECT_FALSE(_message.has_map());
   EXPECT_EQ(_message.player_position().entity(), 11);
-
 }
 
