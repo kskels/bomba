@@ -10,10 +10,18 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT_DIR}/bin)
 
 find_package(Irrlicht REQUIRED)
 find_package(Protobuf REQUIRED)
+find_package(GTest)
+
+include(Utils)
+
+configure_file(config.h.in ${PROJECT_ROOT_DIR}/src/config.h)
 
 add_custom_target(clean-gen
-    rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile ${PROJECT_ROOT_DIR}/bin
+    rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile 
+    ${PROJECT_ROOT_DIR}/bin ${PROJECT_ROOT_DIR}/src/config.h
   )
+
+add_custom_target(unittest)
 
 add_subdirectory(${PROJECT_ROOT_DIR}/src CMakeFiles/src)
 

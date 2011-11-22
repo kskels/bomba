@@ -6,6 +6,7 @@ EXECUTE_PROCESS(COMMAND ${PROTOC_TOOL}
   )
 
 include_directories(
+	${PROTOBUF_INC_DIR}
     ${PROJECT_ROOT_DIR}/src/protobuf
   )
 add_library(bomba_protobuf
