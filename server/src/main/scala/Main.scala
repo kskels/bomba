@@ -1,15 +1,9 @@
 import Protocol.NetMessage
 
-class Bo {
-  
-}
-
-object Main {
-  def main(args: Array[String]) {
-    val msg = NetMessage.getDefaultInstance
-    println("hi")
+object Main extends App {
+  val msg = NetMessage.getDefaultInstance
+  println("hi")
     
-    val server = new ProtoBroker[NetMessage]
-    server.run
-  }
+  val server = new ProtoBroker[NetMessage]
+  server.run
 }
