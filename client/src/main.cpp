@@ -6,7 +6,12 @@
 #include <vector>
 #include <map>
 #include <memory>
+
+#include <irrlicht/irrlicht.h>
 #include "protobuf/protocol.pb.h" // remove ugly .pb
+
+using namespace irr;
+
 
 class GfxDevice {
 public:
@@ -14,6 +19,7 @@ public:
 
   void clear() {}
   void flip() {}
+  void drawMessage(const char *) {}
 };
 
 class HiDevice {
@@ -30,7 +36,7 @@ public:
 class TileMap {
 public:
   void assign(const MapData &data) {}
-  void render(GfxDevice *gfx, double time) {}
+  void render(IrrlichtDevice *gfx, double time) {}
 };
 
 class Entity {
@@ -40,7 +46,7 @@ public:
   virtual void onNetUpdate(const PositionUpdate &) =0;
   virtual void onInput(const HiDevice::Input &) =0;
   virtual void update(double time) =0;
-  virtual void render(GfxDevice *gfx, double time) const =0;
+  virtual void render(IrrlichtDevice *gfx, double time) const =0;
 };
 
 /**
@@ -65,7 +71,7 @@ public:
     if (_delegate) _delegate->update(time);
   }
   
-  void render(GfxDevice *gfx, double time) const {
+  void render(IrrlichtDevice *gfx, double time) const {
     if (_delegate) {
       _delegate->render(gfx, time);
     }
@@ -87,16 +93,38 @@ private:
   Entity *_delegate;
 };
 
+IrrlichtDevice *createGfxDevice(int width, int height) {
+  using core::dimension2d;
+  
+  SIrrlichtCreationParameters params;
+  params.AntiAlias = true;
+  params.WithAlphaChannel = true;
+  params.DeviceType = EIDT_BEST;
+  params.DriverType = video::EDT_OPENGL;
+  params.WindowSize = dimension2d<u32>(width, height);
+  params.Doublebuffer = true;
+  params.Bits = 32;
+  params.ZBufferBits = 16;
+  params.Fullscreen = false;
+  params.Vsync = params.Fullscreen;
+  
+  std::string title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." + 
+    + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
+  std::wstring capt;
+  capt.assign(title.begin(), title.end());
 
-GfxDevice *createGfxDevice() {return new GfxDevice; }
+  std::auto_ptr<IrrlichtDevice> device(createDeviceEx(params));
+  device->setWindowCaption(capt.c_str());
+  return device.release();
+}
+
 HiDevice *createHiDevice() {return new HiDevice; }
-void drawMessage(GfxDevice *, const char *) {}
 
 int main() {
   typedef unsigned EntityId;
   typedef std::map<EntityId, Entity *> EntityMap;
   
-  std::auto_ptr<GfxDevice> gfx(createGfxDevice());
+  std::auto_ptr<IrrlichtDevice> gfx(createGfxDevice(320, 240));
   std::auto_ptr<HiDevice> hid(createHiDevice());
   TileMap map;
   Connection client;
@@ -108,7 +136,9 @@ int main() {
   unsigned long frame = 0;
   
   while (running) {
-    gfx->clear();
+    video::IVideoDriver *video = gfx->getVideoDriver();    
+    video->beginScene(true, true, video::SColor(255, 100, 101, 140));
+    
     if (client.state() == Connection::CONNECTED) {
       // receive network messages and update game state according to events
       NetMessage msg;
@@ -169,9 +199,10 @@ int main() {
       }   
     }
     else if (client.state() == Connection::CONNECTING) {
-      drawMessage(gfx.get(), "Connecting...");
+      //gfx->drawMessage("Connecting...");
     }
     else {
+      localPlayer = 0;
       /*         lobby->update(currentTime, hid);
             lobby->draw(currentTime);
             if (lobby->state().key == GuiScreen::STATE_CONNECT) { // this could be reversed, dip.
@@ -182,7 +213,7 @@ int main() {
     }
 
     ++frame;
-    gfx->flip();
+    video->endScene();
   }
   
 }
