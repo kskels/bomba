@@ -15,14 +15,20 @@ message MapData {
   repeated Tile tiles = 3;
 }
 
+message PlayerInfo {
+  required int32 local_id = 1;
+}
+
 message NetMessage {
   enum Type {
 	POSITION_UPDATE = 0;
 	MAP_DATA = 1;
+	PLAYER_INFO = 2;
   }
 
   required Type type = 1;
   optional PositionUpdate player_position = 2;
   optional MapData map = 3;
+  optional PlayerInfo player_info = 4;
 }
 

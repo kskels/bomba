@@ -43,6 +43,10 @@ public:
   virtual void render(GfxDevice *gfx, double time) const =0;
 };
 
+/**
+ * A proxy entity can be used to store delta packets even though
+ * we don't have the complete definition of the entity yet.
+ */
 class ProxyEntity : public Entity {
 public:
   ProxyEntity() {
@@ -66,13 +70,17 @@ public:
       _delegate->render(gfx, time);
     }
     else {
-      // render placeholder
+      // render placeholder: gfx->drawBox(1, 1, 1, pos)
     }
   }
 
   void setDelegate(Entity *delegate) {
+    // takes ownership
     delete _delegate;
     _delegate = delegate;
+    if (_delegate) {
+      // _delegate->onNetUpdate(storedUpdate);
+    }
   }
   
 private:
@@ -125,6 +133,10 @@ int main() {
           
         case NetMessage::MAP_DATA:
           map.assign(msg.map());
+          break;
+
+        case NetMessage::PLAYER_INFO:
+          localPlayer = static_cast<EntityId>(msg.player_info().local_id());
           break;
         }
       }
