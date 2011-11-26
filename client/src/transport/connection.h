@@ -34,11 +34,8 @@ public:
 
   State state() const;
 
-  const Connection *operator >>(NetMessage &msg) const {
-	if (receive(msg))
-	  return this;
-	else
-	  return 0;
+  NetMessage *operator >>(NetMessage &msg) const {
+	return receive(msg);
   }
   
 private:
