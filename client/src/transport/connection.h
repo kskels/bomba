@@ -34,6 +34,13 @@ public:
 
   State state() const;
 
+  const Connection *operator >>(NetMessage &msg) const {
+	if (receive(msg))
+	  return this;
+	else
+	  return 0;
+  }
+  
 private:
   int _sockfd;
   State _state;

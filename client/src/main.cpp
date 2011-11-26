@@ -90,7 +90,7 @@ public:
   }
   
 private:
-  Entity *_delegate;
+  Entity *_delegate; // TODO: smartptr
 };
 
 IrrlichtDevice *createGfxDevice(int width, int height) {
@@ -142,7 +142,7 @@ int main() {
     if (client.state() == Connection::CONNECTED) {
       // receive network messages and update game state according to events
       NetMessage msg;
-      while (client.receive(msg)) {
+      while (client >> msg) {
         switch (msg.type()) {
         case NetMessage::POSITION_UPDATE: {
           const PositionUpdate &pos = msg.player_position();
@@ -164,7 +164,7 @@ int main() {
         case NetMessage::MAP_DATA:
           map.assign(msg.map());
           break;
-
+          
         case NetMessage::PLAYER_INFO:
           localPlayer = static_cast<EntityId>(msg.player_info().local_id());
           break;
@@ -177,7 +177,7 @@ int main() {
         if (input.escapePressed) {
           running = false;
         }
-
+        
         if (localPlayer) {
           EntityMap::iterator iter = entities.find(localPlayer);
           if (iter != entities.end()) {
@@ -185,18 +185,18 @@ int main() {
           }
         }
       }
-
+      
       // update state of entities
       for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
         iter->second->update(time);
       }
-
+      
       map.render(gfx.get(), time);
-
+      
       // render entities according to internal state
       for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
         iter->second->render(gfx.get(), time);
-      }   
+      }
     }
     else if (client.state() == Connection::CONNECTING) {
       //gfx->drawMessage("Connecting...");
@@ -204,14 +204,14 @@ int main() {
     else {
       localPlayer = 0;
       /*         lobby->update(currentTime, hid);
-            lobby->draw(currentTime);
-            if (lobby->state().key == GuiScreen::STATE_CONNECT) { // this could be reversed, dip.
-                client.connect(lobby->state().value);
-                lobby->resetState();
-                }*/
-
+                 lobby->draw(currentTime);
+                 if (lobby->state().key == GuiScreen::STATE_CONNECT) { // this could be reversed, dip.
+                 client.connect(lobby->state().value);
+                 lobby->resetState();
+                 }*/
+      
     }
-
+    
     ++frame;
     video->endScene();
   }
