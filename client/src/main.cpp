@@ -130,6 +130,8 @@ int main() {
   Connection client;
   EntityMap entities;
 
+  gui::IGUIFont *font = gfx->getGUIEnvironment()->getBuiltInFont();
+  
   EntityId localPlayer = 0;
   bool running = true;
   double time = 0.0;
@@ -203,6 +205,13 @@ int main() {
     }
     else {
       localPlayer = 0;
+
+	  if (font) {
+		font->draw(L"Disconnected.",
+				   core::rect<s32>(130,10,300,50),
+				   video::SColor(255,255,255,255));
+	  }
+	  
       /*         lobby->update(currentTime, hid);
                  lobby->draw(currentTime);
                  if (lobby->state().key == GuiScreen::STATE_CONNECT) { // this could be reversed, dip.
