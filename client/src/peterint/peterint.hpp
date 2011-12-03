@@ -4,6 +4,7 @@
 
 #include <string>
 #include <sstream>
+#include <algorithm>
 #include <iostream>
 
 
@@ -29,7 +30,9 @@ namespace peterint {
       }
       count++;
     }
-    return ss.str();
+    std::string data = ss.str();
+    std::reverse(data.begin(), data.end());
+    return data;
   }
   inline bool decode(char byte, size_t* size) {
     if (byte >> 7) { 
