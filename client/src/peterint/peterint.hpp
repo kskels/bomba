@@ -5,9 +5,10 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include <iostream>
 
-// TODO: Describe Peter's integer handling algorithm
+
+// TODO: Describe Peter's integer handling algorithm, otherwise
+// nobody will ever understand how this workd :D
 
 namespace peterint {
   // TODO: Improve this, kind a crappy code.. 

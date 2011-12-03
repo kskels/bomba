@@ -77,24 +77,22 @@ struct Server {
 
         for (int i(0); i != fdmax+1; ++i) {
         if (FD_ISSET(i, &read_fds) && i != sockfd) {
-          std::cout << "got something: " << i << std::endl;
+
+          // always expect size to come first
+          size_t size = 0;
+          bool more = false;
+          do {
+            char byte = '\0';
+            if (read(newsockfd, &byte, 1) < 0) {
+                throw "Failed to read size..";
+            }
+            more = peterint::decode(byte, &size);
+          } while (more);
+
+          // use size to receive complete NetMessage
           char buffer[256];
           bzero(buffer, 256);
-          int n = read(newsockfd, buffer, 2);
-
-          size_t size = 0;
-          bool more = true;
-          char byte = '\0';
-          
-          while(more) {
-            more = peterint::decode(byte, &size);
-          }
-
-          int16_t wait = atoi(buffer);
-          std::cout << "Got size: " << wait << std::endl;
-
-          bzero(buffer, 256);
-          n = read(newsockfd, buffer, wait);
+          int n = read(newsockfd, buffer, size);
           std::cout << "got byets: " << n << std::endl;
           std::stringstream ss;
           for (int j(0); j != n; ++j) {
