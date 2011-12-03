@@ -1,5 +1,6 @@
 
 #include <connection.h>
+#include <peterint.hpp>
 #include <protocol.pb.h>
 
 #include <gtest/gtest.h>
@@ -80,6 +81,14 @@ struct Server {
           char buffer[256];
           bzero(buffer, 256);
           int n = read(newsockfd, buffer, 2);
+
+          size_t size = 0;
+          bool more = true;
+          char byte = '\0';
+          
+          while(more) {
+            more = peterint::decode(byte, &size);
+          }
 
           int16_t wait = atoi(buffer);
           std::cout << "Got size: " << wait << std::endl;

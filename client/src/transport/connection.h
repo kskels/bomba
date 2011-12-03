@@ -30,11 +30,11 @@ public:
    * @return a pointer to the NetMessage received, or 0 if
    *         there's not enough data to construct a message.
    */	 
-  NetMessage *receive(NetMessage &message) const {};
+  NetMessage *receive() const;
 
   State state() const;
 
-  NetMessage *operator >>(NetMessage &msg) const {return receive(msg); }
+  NetMessage *operator >>(NetMessage &msg) const {return receive(); }
   Connection &operator <<(NetMessage &msg) {send(msg); return *this; }
   
 private:

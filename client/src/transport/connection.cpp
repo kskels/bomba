@@ -47,6 +47,9 @@ void Connection::send(const NetMessage &message) {
   std::stringstream ss;
   message.SerializeToOstream(&ss);
 
+    
+
+
   std::stringstream size;
   size << ss.str().size();
 
@@ -58,6 +61,10 @@ void Connection::send(const NetMessage &message) {
   if (n < 0) 
     throw std::string("Failed to write data into the socket"); 
   std::cout << "Sent " << n << " bytes =]" << std::endl;
+}
+
+NetMessage* Connection::receive() const {
+
 }
 
 Connection::State Connection::state() const {

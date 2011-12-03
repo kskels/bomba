@@ -2,6 +2,7 @@
 include_directories(
     ${PROJECT_ROOT_DIR}/src/protobuf
     ${PROJECT_ROOT_DIR}/src/transport
+    ${PROJECT_ROOT_DIR}/src/peterint
   )
 
 add_library(bomba_transport
