@@ -3,12 +3,33 @@
 #define _PETERINT_H_
 
 #include <string>
+#include <sstream>
 #include <iostream>
 
 
 namespace peterint {
   inline std::string encode(size_t size) {
-    return "Kaspars";
+    std::stringstream ss;
+    size_t count = 0;
+    while (true) {
+      if (size > 127) {
+        char byte = size & 0x000000000000007F; 
+        if (count) {
+            byte = byte | 0x80;
+        }
+        ss << byte;
+        size = size >> 7;
+      } else {
+        char byte = size;
+        if (count) {
+            byte = byte | 0x80;
+        }
+        ss << byte;
+        break;
+      }
+      count++;
+    }
+    return ss.str();
   }
   inline bool decode(char byte, size_t* size) {
     if (byte >> 7) { 
