@@ -43,7 +43,7 @@ namespace peterint {
     *size = *size + byte; 
     return false;
   }
-};
+} // namespace
 
 #endif // _PETERINT_H_
 
