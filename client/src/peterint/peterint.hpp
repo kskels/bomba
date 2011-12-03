@@ -7,8 +7,10 @@
 #include <algorithm>
 #include <iostream>
 
+// TODO: Describe Peter's integer handling algorithm
 
 namespace peterint {
+  // TODO: Improve this, kind a crappy code.. 
   inline std::string encode(size_t size) {
     std::stringstream ss;
     size_t count = 0;
@@ -34,6 +36,7 @@ namespace peterint {
     std::reverse(data.begin(), data.end());
     return data;
   }
+
   inline bool decode(char byte, size_t* size) {
     if (byte >> 7) { 
       *size = *size + (byte + 128);   
@@ -43,6 +46,7 @@ namespace peterint {
     *size = *size + byte; 
     return false;
   }
+
 } // namespace
 
 #endif // _PETERINT_H_
