@@ -25,4 +25,4 @@ TEST_F(PeterintTest, TestEncodeDecode)
     for (size_t i(0); i != 7; ++i)
       EXPECT_EQ(values[i], size(peterint::encode(values[i])));
 }
-     
+
