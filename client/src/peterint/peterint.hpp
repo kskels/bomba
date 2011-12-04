@@ -11,31 +11,20 @@
 // nobody will ever understand how this workd :D
 
 namespace peterint {
-  // TODO: Improve this, kind a crappy code.. 
   inline std::string encode(size_t size) {
-    std::stringstream ss;
-    size_t count = 0;
+    std::string result;
     while (true) {
-      if (size > 127) {
-        char byte = size & 0x7F; 
-        if (count) {
-            byte = byte | 0x80;
-        }
-        ss << byte;
-        size = size >> 7;
-      } else {
-        char byte = size;
-        if (count) {
-            byte = byte | 0x80;
-        }
-        ss << byte;
+      char byte = size & 0x7F;
+      if (!result.empty())
+        byte = byte | 0x80;
+      result.insert(result.begin(), byte);
+
+      if (size > 127)
+        size = size >> 7; 
+      else 
         break;
-      }
-      count++;
     }
-    std::string data = ss.str();
-    std::reverse(data.begin(), data.end());
-    return data;
+    return result;
   }
 
   inline bool decode(char byte, size_t* size) {
