@@ -5,24 +5,18 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <iostream>
 
-
-// TODO: Describe Peter's integer handling algorithm, otherwise
-// nobody will ever understand how this workd :D
 
 namespace peterint {
+
   inline std::string encode(size_t size) {
     std::string result;
-    while (true) {
+    for (; size || result.empty(); size = size >> 7) {
       char byte = size & 0x7F;
       if (!result.empty())
         byte = byte | 0x80;
       result.insert(result.begin(), byte);
-
-      if (size > 127)
-        size = size >> 7; 
-      else 
-        break;
     }
     return result;
   }

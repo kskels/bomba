@@ -6,6 +6,7 @@
 class PeterintTest : public ::testing::Test {
 protected:
   size_t size(const std::string& data) {
+    EXPECT_TRUE(data.size());
     size_t size = 0;
     for (size_t i(0); i != data.size(); ++i) {
       bool more = peterint::decode(data[i], &size);
