@@ -3,8 +3,6 @@
 #define _PETERINT_H_
 
 #include <string>
-#include <sstream>
-#include <algorithm>
 
 
 namespace peterint {
