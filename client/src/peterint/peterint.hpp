@@ -17,7 +17,7 @@ namespace peterint {
     size_t count = 0;
     while (true) {
       if (size > 127) {
-        char byte = size & 0x000000000000007F; 
+        char byte = size & 0x7F; 
         if (count) {
             byte = byte | 0x80;
         }
