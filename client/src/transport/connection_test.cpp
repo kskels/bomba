@@ -15,6 +15,7 @@
 static const unsigned _port = 14242; 
 bool _accepted = false;
 bool _received = false;
+bool _echoed = false;
 NetMessage _message;
 
 std::string _got;
@@ -80,28 +81,33 @@ struct Server {
 
           // always expect size to come first
           size_t size = 0;
-          bool more = false;
+          char byte;
           do {
-            char byte = '\0';
-            if (read(newsockfd, &byte, 1) < 0) {
+            if (::read(newsockfd, &byte, 1) < 0)
                 throw "Failed to read size..";
-            }
-            more = peterint::decode(byte, &size);
-          } while (more);
+          } while (peterint::decode(byte, &size));
 
           // use size to receive complete NetMessage
           char buffer[256];
           bzero(buffer, 256);
           int n = read(newsockfd, buffer, size);
           std::cout << "got byets: " << n << std::endl;
-          std::stringstream ss;
-          for (int j(0); j != n; ++j) {
-            std::cout << "." << std::endl;
-            ss << buffer[j];
-          }
-          _got = ss.str();
-          _message.ParseFromIstream(&ss);
-          _received = true;
+          if (n) {
+            std::stringstream ss;
+            for (int j(0); j != n; ++j) {
+              std::cout << "." << std::endl;
+              ss << buffer[j];
+            }
+            _got = ss.str();
+            _message.ParseFromIstream(&ss);
+            _received = true;
+
+            // echo back
+            std::string s = peterint::encode(size);
+            ::write(newsockfd, s.c_str(), s.size());
+            ::write(newsockfd, buffer, size);
+            _echoed = true;
+          }  
         }
         }
       }    
@@ -155,10 +161,7 @@ TEST_F(ConnectionTest, TestConnection) {
   EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
 }
 
-TEST_F(ConnectionTest, TestSend) {
-
-  std::cout << sizeof(int16_t) << std::endl;
-
+TEST_F(ConnectionTest, TestSendReceive) {
   Connection connection;
   EXPECT_NO_THROW(connection.connect("localhost", _port));
   EXPECT_EQ(connection.state(), Connection::CONNECTED);
@@ -189,5 +192,15 @@ TEST_F(ConnectionTest, TestSend) {
   EXPECT_TRUE(_message.has_player_position());
   EXPECT_FALSE(_message.has_map());
   EXPECT_EQ(_message.player_position().entity(), 11);
+
+  while(!_echoed);
+
+  NetMessage* m = connection.receive();
+  ASSERT_TRUE(m);
+
+  EXPECT_EQ(m->type(), _message.type());
+  EXPECT_EQ(m->has_player_position(), _message.has_player_position());
+  EXPECT_EQ(m->has_map(), _message.has_map());
+  EXPECT_EQ(m->player_position().entity(), _message.player_position().entity());
 }
 
