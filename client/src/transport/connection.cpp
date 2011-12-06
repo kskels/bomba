@@ -67,14 +67,14 @@ void Connection::send(const NetMessage &message) {
   std::string size = peterint::encode(ss.str().size());
   if (::write(_sockfd, size.c_str(), size.size()) < 0) {
     Log(INFO) << "Failed to write size into the socket";
-    disconnect(); 
+    _state = DISCONNECTED;
     return;
   }
   Log(DEBUG) << "Sent size in " << size.size() << " bytes";
 
   if (::write(_sockfd, ss.str().c_str(), ss.str().size()) < 0) {
     Log(INFO) << "Failed to write data into the socket";
-    disconnect();
+    _state = DISCONNECTED;
     return;
   }
   Log(DEBUG) << "Sent data in " << ss.str().size() << " bytes";
@@ -87,7 +87,7 @@ NetMessage* Connection::receive(NetMessage& message) {
     return 0;
   } else if (n < 0) {
     Log(INFO) << "Failed to recv from the socket";
-    disconnect();
+    _state = DISCONNECTED;
     return 0;
   }
 
@@ -95,7 +95,7 @@ NetMessage* Connection::receive(NetMessage& message) {
   while(peterint::decode(byte, &size)) {
     if(::recv(_sockfd, &byte, 1, 0) < 0) {
       Log(INFO) << "Failed to recv from the socket";
-      disconnect();
+      _state = DISCONNECTED;
       return 0;
     }
   }
@@ -105,11 +105,11 @@ NetMessage* Connection::receive(NetMessage& message) {
   n = ::recv(_sockfd, buffer, size, 0);
   if (n < 0) {
     Log(INFO) << "Failed to recv from the socket";
-    disconnect();
+    _state = DISCONNECTED;
     return 0;
   } else if (n != size) {
     Log(INFO) << "Failed to recv complete message";
-    disconnect();
+    _state = DISCONNECTED;
     return 0;
   }
 
