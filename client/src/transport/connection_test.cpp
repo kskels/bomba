@@ -194,8 +194,8 @@ TEST_F(ConnectionTest, TestSendReceive) {
   EXPECT_EQ(_message.player_position().entity(), 11);
 
   while(!_echoed);
-
-  NetMessage* m = connection.receive();
+  NetMessage mm;
+  NetMessage* m = connection.receive(mm);
   ASSERT_TRUE(m);
 
   EXPECT_EQ(m->type(), _message.type());

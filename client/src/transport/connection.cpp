@@ -55,7 +55,7 @@ void Connection::send(const NetMessage &message) {
     throw "Failed to write data into the socket"; 
 }
 
-NetMessage* Connection::receive() const {
+NetMessage* Connection::receive(NetMessage& message) const {
   char byte;
   int n = ::recv(_sockfd, &byte, 1, MSG_DONTWAIT);
   if (n == 0 || errno == EAGAIN || errno == EWOULDBLOCK) 
@@ -80,10 +80,8 @@ NetMessage* Connection::receive() const {
   std::stringstream ss;
   for (int i(0); i != size; ++i)
     ss << buffer[i];
-
-  NetMessage message; 
   message.ParseFromIstream(&ss);
-  return new NetMessage(message); // a leak !!
+  return &message;
 }
 
 Connection::State Connection::state() const {
