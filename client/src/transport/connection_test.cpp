@@ -2,6 +2,7 @@
 #include <connection.h>
 #include <peterint.hpp>
 #include <protocol.pb.h>
+#include <log.hpp>
 
 #include <gtest/gtest.h>
 
@@ -50,7 +51,7 @@ struct Server {
       int newsockfd;
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &clilen);
-      std::cout << "newsockfd: " << newsockfd << std::endl;
+      //std::cout << "newsockfd: " << newsockfd << std::endl;
       if (newsockfd < 0)
         throw std::string("Failed to accept"); 
       _accepted = true;
@@ -65,7 +66,7 @@ struct Server {
 
       FD_SET(sockfd, &master);
       int fdmax = sockfd;
-      std::cout << "sockfd: " << fdmax << std::endl;
+      //std::cout << "sockfd: " << fdmax << std::endl;
 
       FD_SET(newsockfd, &master);
       if (newsockfd > fdmax)
@@ -91,11 +92,11 @@ struct Server {
           char buffer[256];
           bzero(buffer, 256);
           int n = read(newsockfd, buffer, size);
-          std::cout << "got byets: " << n << std::endl;
+          //std::cout << "got byets: " << n << std::endl;
           if (n) {
             std::stringstream ss;
             for (int j(0); j != n; ++j) {
-              std::cout << "." << std::endl;
+              //std::cout << "." << std::endl;
               ss << buffer[j];
             }
             _got = ss.str();
@@ -202,5 +203,8 @@ TEST_F(ConnectionTest, TestSendReceive) {
   EXPECT_EQ(m->has_player_position(), _message.has_player_position());
   EXPECT_EQ(m->has_map(), _message.has_map());
   EXPECT_EQ(m->player_position().entity(), _message.player_position().entity());
+
+  connection.disconnect();
+  EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
 }
 

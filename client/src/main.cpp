@@ -1,6 +1,7 @@
 
 #include <config.h>
 #include <connection.h>
+#include <log.hpp> 
 
 #include <iostream>
 #include <vector>
@@ -121,6 +122,8 @@ IrrlichtDevice *createGfxDevice(int width, int height) {
 HiDevice *createHiDevice() {return new HiDevice; }
 
 int main() {
+  Log::registerConsumer(Log::DefaultLogConsumer());
+
   typedef unsigned EntityId;
   typedef std::map<EntityId, Entity *> EntityMap;
   
@@ -128,6 +131,7 @@ int main() {
   std::auto_ptr<HiDevice> hid(createHiDevice());
   TileMap map;
   Connection client;
+  client.connect("localhost");
   EntityMap entities;
 
   gui::IGUIFont *font = gfx->getGUIEnvironment()->getBuiltInFont();
