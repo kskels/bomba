@@ -30,7 +30,7 @@ public:
    * @return a pointer to the NetMessage received, or 0 if
    *         there's not enough data to construct a message.
    */	 
-  NetMessage *receive(NetMessage& message) const;
+  NetMessage *receive(NetMessage &message) const;
 
   State state() const;
 
