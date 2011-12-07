@@ -28,7 +28,8 @@ import com.google.protobuf.MessageLite
 class ProtoBroker {
   def run[T <: Actor](defaultInstance: MessageLite)(implicit m: Manifest[T]) {
     val bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
-      Executors.newCachedThreadPool(), Executors.newCachedThreadPool()))
+      Executors.newCachedThreadPool(),
+      Executors.newCachedThreadPool()))
 
     bootstrap.setPipelineFactory(new ChannelPipelineFactory {
       def getPipeline = {
