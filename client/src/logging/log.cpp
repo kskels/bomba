@@ -19,7 +19,7 @@ Log::Log(Severity severity, const char* file, const char* function, int line)
 Log::~Log() {
   for (std::vector<Consumer>::iterator it = _consumers.begin(); 
     it != _consumers.end(); ++it) {
-    (*it)(_severity, _stream.str());yarh, th
+    (*it)(_severity, _stream.str());
   }
 }
 
