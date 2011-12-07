@@ -122,7 +122,7 @@ IrrlichtDevice *createGfxDevice(int width, int height) {
 HiDevice *createHiDevice() {return new HiDevice; }
 
 int main() {
-  Log::registerConsumer(Log::DefaultLogConsumer());
+  Log::registerConsumer(Log::ToCoutConsumer());
 
   typedef unsigned EntityId;
   typedef std::map<EntityId, Entity *> EntityMap;

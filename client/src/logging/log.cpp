@@ -10,58 +10,47 @@ std::vector<Log::Consumer> Log::_consumers;
 
 Log::Log(Severity severity, const char* file, const char* function, int line) 
   : _severity(severity) {
-  std::string severity_name;
-  switch (_severity) {
-//  case SEVERITY_ERROR:
-//    severity_name = "error";
-//    break;
-//  case SEVERITY_WARNING:
-//    severity_name = "warning";
-//    break;
-  case SEVERITY_INFO:
-    severity_name = "info";
-    break;
-  case SEVERITY_DEBUG:
-    severity_name = "debug";
-    break;
-  default:
-    severity_name = "??";
-  }
-  // FIXME kaspars: Fix this for Windows later
-  std::string file_name = file ? file : "";
-  size_t pos = file_name.find_last_of("/"); 
-  file_name = file_name.substr(pos+1);
-  _stream << "[" << severity_name << " " << file_name << ":" << line << " " 
-    << function << "] "; 
-} // log
+  std::string level = _severity == SEVERITY_INFO ? "info" : "debug";
+  std::string fname = file ? file : "";
+  fname = fname.substr(fname.find_last_of("/")+1);
+  _stream << "[" << level << " " << fname << ":" << line << " " << function << "] "; 
+}
 
 Log::~Log() {
   for (std::vector<Consumer>::iterator it = _consumers.begin(); 
     it != _consumers.end(); ++it) {
-    (*it)(_severity, _stream.str());
+    (*it)(_severity, _stream.str());yarh, th
   }
-} // ~log
+}
 
 void Log::registerConsumer(const Consumer &consumer) {
   _consumers.push_back(consumer); 
 }
 
-Log::DefaultLogConsumer::DefaultLogConsumer() : _level(SEVERITY_DEBUG) {
-    char *level = getenv("BOMBA_LOGGING_LEVEL");
-    if (level) {
-      _level = static_cast<Severity>(std::atoi(level)); 
-    }
+Log::ToCoutConsumer::ToCoutConsumer() : _severity(SEVERITY_DEBUG) {
+  char *severity = getenv("BOMBA_LOGGING_LEVEL");
+  if (severity) {
+    _severity = static_cast<Severity>(std::atoi(severity)); 
+  }
 }
 
-void Log::DefaultLogConsumer::operator()(Log::Severity severity, 
+void Log::ToCoutConsumer::operator()(Log::Severity severity, 
   const std::string &line) {
-  if (_level > severity) {
+  if (_severity > severity) {
     std::cout << line << std::endl;
+  }
+}
+
+Log::ToFileConsumer::ToFileConsumer(const std::string &path) : _severity(SEVERITY_DEBUG), _path(path) {
+  char *severity = getenv("BOMBA_LOGGING_LEVEL");
+  if (severity) {
+    _severity = static_cast<Severity>(std::atoi(severity)); 
   }
 }
 
 void Log::ToFileConsumer::operator()(Log::Severity severity, 
   const std::string &line) {
+  if (_severity > severity) {
     std::ofstream file;
     file.open(_path.c_str(), std::ios::app);
     if (!_path.empty() && file.is_open()) {
@@ -70,5 +59,6 @@ void Log::ToFileConsumer::operator()(Log::Severity severity,
     } else {
       std::cout << line << std::endl;
     } 
+  }
 }
 

@@ -5,7 +5,6 @@
 #include <sstream>
 #include <vector>
 #include <string>
-#include <iostream>
 
 #ifdef _WIN32
 #include <functional>
@@ -13,18 +12,14 @@
 #include <tr1/functional>
 #endif
 
-// could probably use __PRETTY_FUNCTION__ on gcc, but maybe we show too much info to the outsider
-// #define ERROR Log::SEVERITY_ERROR, __FILE__, __FUNCTION__, __LINE__
-// #define WARNING Log::SEVERITY_WARNING, __FILE__, __FUNCTION__, __LINE__
 #define INFO Log::SEVERITY_INFO, __FILE__, __FUNCTION__, __LINE__
 #define DEBUG Log::SEVERITY_DEBUG, __FILE__, __FUNCTION__, __LINE__
 
 
 class Log {
 public:
+ 
   enum Severity {
-    // SEVERITY_ERROR,
-    // SEVERITY_WARNING,
     SEVERITY_INFO,
     SEVERITY_DEBUG
   };
@@ -38,20 +33,21 @@ public:
     return *this;
   }
 
-  typedef std::tr1::function<void(Severity,const std::string&)> Consumer;
+  typedef std::tr1::function<void(Severity, const std::string&)> Consumer;
   static void registerConsumer(const Consumer &consumer);
 
-  struct DefaultLogConsumer { 
-    DefaultLogConsumer();
+  struct ToCoutConsumer { 
+    ToCoutConsumer();
     void operator()(Log::Severity severity, const std::string &line); 
   private:
-    Severity _level;
+    Severity _severity;
   };
  
   struct ToFileConsumer {
-    ToFileConsumer(const std::string &path) : _path(path) {}
+    ToFileConsumer(const std::string &path);
     void operator()(Log::Severity severity, const std::string &line);
   private:
+    Severity _severity;
     std::string _path;
   };
 
