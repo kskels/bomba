@@ -44,6 +44,7 @@ void Connection::connect(const std::string &address, unsigned port) {
   serv_addr.sin_family = AF_INET;
   bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
   serv_addr.sin_port = htons(port);
+  // TODO: non-blocking connect
   if (::connect(_sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
     Log(INFO) << "Failed to connect";
     _state = DISCONNECTED;
@@ -72,6 +73,9 @@ void Connection::send(const NetMessage &message) {
   }
   Log(DEBUG) << "Sent size in " << size.size() << " bytes";
 
+  // TODO: write -> send
+  // TODO: buffered send and nonblocking + non-busywaiting
+
   if (::write(_sockfd, ss.str().c_str(), ss.str().size()) < 0) {
     Log(INFO) << "Failed to write data into the socket";
     _state = DISCONNECTED;
@@ -80,7 +84,7 @@ void Connection::send(const NetMessage &message) {
   Log(DEBUG) << "Sent data in " << ss.str().size() << " bytes";
 }
 
-NetMessage* Connection::receive(NetMessage& message) {
+NetMessage *Connection::receive(NetMessage &message) {
   char byte;
   int n = ::recv(_sockfd, &byte, 1, MSG_DONTWAIT);
   if (n == 0 || errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -91,6 +95,7 @@ NetMessage* Connection::receive(NetMessage& message) {
     return 0;
   }
 
+  // TODO: buffered + nonblocking recv
   size_t size = 0;
   while(peterint::decode(byte, &size)) {
     if(::recv(_sockfd, &byte, 1, 0) < 0) {
@@ -100,7 +105,7 @@ NetMessage* Connection::receive(NetMessage& message) {
     }
   }
  
-  char buffer[size];
+  char buffer[size];  // TODO: not standard-compliant
   bzero(buffer, size);
   n = ::recv(_sockfd, buffer, size, 0);
   if (n < 0) {
