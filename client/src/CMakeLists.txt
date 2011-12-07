@@ -4,10 +4,12 @@ include_directories(
     ${PROJECT_ROOT_DIR}/src
     ${PROJECT_ROOT_DIR}/src/transport
     ${PROJECT_ROOT_DIR}/src/protobuf
+    ${PROJECT_ROOT_DIR}/src/logging
   )
 
 FILE(GLOB BOMBA_SOURCE_FILES "*.cpp")
 add_executable(bomba
+    ${PROJECT_ROOT_DIR}/src/logging/log.cpp
     ${BOMBA_SOURCE_FILES}
   )
 
@@ -44,4 +46,5 @@ endif (APPLE)
 
 add_subdirectory(protobuf)
 add_subdirectory(transport)
+add_subdirectory(peterint)
 

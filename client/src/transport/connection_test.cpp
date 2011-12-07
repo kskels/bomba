@@ -1,6 +1,8 @@
 
 #include <connection.h>
+#include <peterint.hpp>
 #include <protocol.pb.h>
+#include <log.hpp>
 
 #include <gtest/gtest.h>
 
@@ -14,6 +16,7 @@
 static const unsigned _port = 14242; 
 bool _accepted = false;
 bool _received = false;
+bool _echoed = false;
 NetMessage _message;
 
 std::string _got;
@@ -48,7 +51,7 @@ struct Server {
       int newsockfd;
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &clilen);
-      std::cout << "newsockfd: " << newsockfd << std::endl;
+      //std::cout << "newsockfd: " << newsockfd << std::endl;
       if (newsockfd < 0)
         throw std::string("Failed to accept"); 
       _accepted = true;
@@ -63,7 +66,7 @@ struct Server {
 
       FD_SET(sockfd, &master);
       int fdmax = sockfd;
-      std::cout << "sockfd: " << fdmax << std::endl;
+      //std::cout << "sockfd: " << fdmax << std::endl;
 
       FD_SET(newsockfd, &master);
       if (newsockfd > fdmax)
@@ -76,25 +79,36 @@ struct Server {
 
         for (int i(0); i != fdmax+1; ++i) {
         if (FD_ISSET(i, &read_fds) && i != sockfd) {
-          std::cout << "got something: " << i << std::endl;
+
+          // always expect size to come first
+          size_t size = 0;
+          char byte;
+          do {
+            if (::read(newsockfd, &byte, 1) < 0)
+                throw "Failed to read size..";
+          } while (peterint::decode(byte, &size));
+
+          // use size to receive complete NetMessage
           char buffer[256];
           bzero(buffer, 256);
-          int n = read(newsockfd, buffer, 2);
+          int n = read(newsockfd, buffer, size);
+          //std::cout << "got byets: " << n << std::endl;
+          if (n) {
+            std::stringstream ss;
+            for (int j(0); j != n; ++j) {
+              //std::cout << "." << std::endl;
+              ss << buffer[j];
+            }
+            _got = ss.str();
+            _message.ParseFromIstream(&ss);
+            _received = true;
 
-          int16_t wait = atoi(buffer);
-          std::cout << "Got size: " << wait << std::endl;
-
-          bzero(buffer, 256);
-          n = read(newsockfd, buffer, wait);
-          std::cout << "got byets: " << n << std::endl;
-          std::stringstream ss;
-          for (int j(0); j != n; ++j) {
-            std::cout << "." << std::endl;
-            ss << buffer[j];
-          }
-          _got = ss.str();
-          _message.ParseFromIstream(&ss);
-          _received = true;
+            // echo back
+            std::string s = peterint::encode(size);
+            ::write(newsockfd, s.c_str(), s.size());
+            ::write(newsockfd, buffer, size);
+            _echoed = true;
+          }  
         }
         }
       }    
@@ -148,10 +162,7 @@ TEST_F(ConnectionTest, TestConnection) {
   EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
 }
 
-TEST_F(ConnectionTest, TestSend) {
-
-  std::cout << sizeof(int16_t) << std::endl;
-
+TEST_F(ConnectionTest, TestSendReceive) {
   Connection connection;
   EXPECT_NO_THROW(connection.connect("localhost", _port));
   EXPECT_EQ(connection.state(), Connection::CONNECTED);
@@ -182,5 +193,18 @@ TEST_F(ConnectionTest, TestSend) {
   EXPECT_TRUE(_message.has_player_position());
   EXPECT_FALSE(_message.has_map());
   EXPECT_EQ(_message.player_position().entity(), 11);
+
+  while(!_echoed);
+  NetMessage mm;
+  NetMessage* m = connection.receive(mm);
+  ASSERT_TRUE(m);
+
+  EXPECT_EQ(m->type(), _message.type());
+  EXPECT_EQ(m->has_player_position(), _message.has_player_position());
+  EXPECT_EQ(m->has_map(), _message.has_map());
+  EXPECT_EQ(m->player_position().entity(), _message.player_position().entity());
+
+  connection.disconnect();
+  EXPECT_EQ(connection.state(), Connection::DISCONNECTED);
 }
 
