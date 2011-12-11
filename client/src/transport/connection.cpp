@@ -51,7 +51,7 @@ void Connection::connect(const std::string &address, unsigned port) {
     _state = DISCONNECTED;
     return;
   }
-  Log(INFO) << "Connection established";
+  Log(INFO) << "Connection established :)";
 
   _state = CONNECTED;  
 }

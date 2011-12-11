@@ -130,8 +130,25 @@ int main() {
   std::auto_ptr<IrrlichtDevice> gfx(createGfxDevice(320, 240));
   std::auto_ptr<HiDevice> hid(createHiDevice());
   TileMap map;
+
   Connection client;
   client.connect("localhost");
+
+  do {
+    Log(DEBUG) << "Sending an initial position update";
+    
+    PositionUpdate position;
+    position.set_entity(1);
+    position.set_x(2);
+    position.set_y(3);
+
+    NetMessage message;
+    message.set_type(NetMessage::POSITION_UPDATE);
+    *(message.mutable_player_position()) = position;
+
+    client.send(message);
+  } while (false);
+
   EntityMap entities;
 
   gui::IGUIFont *font = gfx->getGUIEnvironment()->getBuiltInFont();
@@ -140,7 +157,8 @@ int main() {
   bool running = true;
   double time = 0.0;
   unsigned long frame = 0;
-  
+
+  Log(INFO) << "Watch out, entering the main loop..";  
   while (running) {
     video::IVideoDriver *video = gfx->getVideoDriver();    
     video->beginScene(true, true, video::SColor(255, 100, 101, 140));
