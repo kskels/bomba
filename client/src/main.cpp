@@ -2,14 +2,14 @@
 #include <config.h>
 #include <connection.h>
 #include <log.hpp> 
+#include <protocol.pb.h> // remove ugly .pb
 
-#include <iostream>
 #include <vector>
-#include <map>
 #include <memory>
+#include <map>
+#include <string>
 
 #include <irrlicht/irrlicht.h>
-#include "protobuf/protocol.pb.h" // remove ugly .pb
 
 using namespace irr;
 
