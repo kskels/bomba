@@ -4,12 +4,12 @@
 #include <log.hpp> 
 #include <protocol.pb.h> // remove ugly .pb
 
+#include <irrlicht/irrlicht.h>
+
 #include <vector>
 #include <memory>
 #include <map>
 #include <string>
-
-#include <irrlicht/irrlicht.h>
 
 using namespace irr;
 
