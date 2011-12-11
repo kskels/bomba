@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,10 +105,9 @@ NetMessage *Connection::receive(NetMessage &message) {
       return 0;
     }
   }
- 
-  char buffer[size];  // TODO: not standard-compliant
-  bzero(buffer, size);
-  n = ::recv(_sockfd, buffer, size, 0);
+
+  std::vector<char> buffer(size, 0); 
+  n = ::recv(_sockfd, &buffer[0], size, 0);
   if (n < 0) {
     Log(INFO) << "Failed to recv from the socket";
     _state = DISCONNECTED;
