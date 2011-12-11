@@ -46,5 +46,4 @@ endif (APPLE)
 
 add_subdirectory(protobuf)
 add_subdirectory(transport)
-add_subdirectory(peterint)
 
