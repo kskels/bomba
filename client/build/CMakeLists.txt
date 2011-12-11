@@ -22,6 +22,9 @@ add_custom_target(clean-gen
   )
 
 add_custom_target(unittest)
+add_custom_command(TARGET unittest POST_BUILD
+    COMMAND ${PROJECT_ROOT_DIR}/util/unittest.sh ${PROJECT_ROOT_DIR}/bin
+  )
 
 add_subdirectory(${PROJECT_ROOT_DIR}/src CMakeFiles/src)
 
