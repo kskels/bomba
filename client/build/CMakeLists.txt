@@ -2,6 +2,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(bomba)
 
+set(CMAKE_CXX_FLAGS "-Wall -pedantic")
+
 set(PROJECT_ROOT_DIR ${PROJECT_SOURCE_DIR}/..)
 set(CMAKE_MODULE_PATH ${PROJECT_ROOT_DIR}/cmake)
 

@@ -82,7 +82,7 @@ struct Server {
 
           // always expect size to come first
           size_t size = 0;
-          char byte;
+          char byte = '\0';
           do {
             if (::read(newsockfd, &byte, 1) < 0)
                 throw "Failed to read size..";

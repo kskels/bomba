@@ -16,7 +16,7 @@ public:
   enum State {
     DISCONNECTED,
     CONNECTING,
-    CONNECTED,
+    CONNECTED
   };
 
   Connection() : _sockfd(0), _state(DISCONNECTED){};
