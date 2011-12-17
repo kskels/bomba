@@ -28,5 +28,6 @@ add_custom_command(TARGET unittest POST_BUILD
     COMMAND ${PROJECT_ROOT_DIR}/util/unittest.sh ${PROJECT_ROOT_DIR}/bin
   )
 
+add_subdirectory(${PROJECT_ROOT_DIR}/3pp/pcfg CMakeFiles/Pcfg)
 add_subdirectory(${PROJECT_ROOT_DIR}/src CMakeFiles/src)
 
