@@ -167,6 +167,8 @@ int main() {
       // receive network messages and update game state according to events
       NetMessage msg;
       while (client >> msg) {
+        Log(INFO) << "received msg of type " << msg.type();
+		
         switch (msg.type()) {
         case NetMessage::POSITION_UPDATE: {
           const PositionUpdate &pos = msg.player_position();
