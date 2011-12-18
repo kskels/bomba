@@ -2,8 +2,15 @@ import Protocol.NetMessage
 import akka.actor.Actor
 
 class Player extends Actor {
+  override def preStart() = {
+    println("connected")
+  }
+
+  override def postStop() = {
+    println("disconnected")
+  }
+  
   def receive = {
-    case Connected() => println("connected!")
     case msg: NetMessage => println("got netmessage " + msg.getType())
     case _ => println("recv unkown msg")
   }

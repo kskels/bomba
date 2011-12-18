@@ -56,11 +56,9 @@ import org.jboss.netty.channel.{
   MessageEvent
 }
 
-case class Connected()
-
 class ChannelActorGlue(actor: ActorRef) extends SimpleChannelUpstreamHandler {
   override def channelConnected(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
-    actor ! Connected()
+    // should we start the actor here..?
   }
 
   override def channelDisconnected(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
