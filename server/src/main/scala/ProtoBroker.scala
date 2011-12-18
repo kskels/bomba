@@ -1,21 +1,4 @@
 import akka.actor.{Actor, ActorRef}
-
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
-import org.jboss.netty.bootstrap.ServerBootstrap
-import org.jboss.netty.channel.{
-  ChannelPipelineFactory,
-  Channels
-}
-
-import org.jboss.netty.handler.codec.protobuf.{
-  ProtobufDecoder,
-  ProtobufEncoder,
-  ProtobufVarint32FrameDecoder,
-  ProtobufVarint32LengthFieldPrepender
-}
-
-import java.net.InetSocketAddress
-import java.util.concurrent.Executors
 import com.google.protobuf.MessageLite
 
 /**
@@ -25,13 +8,27 @@ import com.google.protobuf.MessageLite
  * the actor dies, any session metadata is removed.
  * Note that the server might be multithreaded.
  */
-class ProtoBroker {
-  def run[T <: Actor](defaultInstance: MessageLite)(implicit m: Manifest[T]) {
+class ProtoBroker[M <: MessageLite: Manifest] {
+  import java.net.InetSocketAddress
+
+  def run[T <: Actor: Manifest](address: InetSocketAddress) {
+    import java.util.concurrent.Executors
+    import org.jboss.netty.channel.{ChannelPipelineFactory, Channels}
+    import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
+    import org.jboss.netty.bootstrap.ServerBootstrap
+    import org.jboss.netty.handler.codec.protobuf.{
+      ProtobufDecoder,
+      ProtobufEncoder,
+      ProtobufVarint32FrameDecoder,
+      ProtobufVarint32LengthFieldPrepender
+    }
+
     val bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
       Executors.newCachedThreadPool(),
       Executors.newCachedThreadPool()))
 
     bootstrap.setPipelineFactory(new ChannelPipelineFactory {
+      val defaultInstance = manifest[M].erasure.getMethod("getDefaultInstance").invoke(null).asInstanceOf[MessageLite]
       def getPipeline = {
         val p = Channels.pipeline()
         p.addLast("frameDecoder", new ProtobufVarint32FrameDecoder())
@@ -43,29 +40,21 @@ class ProtoBroker {
       }
     })
 
-    bootstrap.bind(new InetSocketAddress(14242))
+    bootstrap.bind(address)
     
     println("*** server starting")
   }
 }
 
-import org.jboss.netty.channel.{
-  SimpleChannelUpstreamHandler,
-  ChannelHandlerContext,
-  ChannelStateEvent,
-  MessageEvent
-}
+import org.jboss.netty.channel.SimpleChannelUpstreamHandler
 
 class ChannelActorGlue(actor: ActorRef) extends SimpleChannelUpstreamHandler {
+  import org.jboss.netty.channel.{ChannelHandlerContext, ChannelStateEvent, MessageEvent}
+  
   override def channelConnected(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
     // should we start the actor here..?
   }
 
-  override def channelDisconnected(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
-    actor.stop()
-  }
-
-  override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
-    actor ! e.getMessage
-  }
+  override def channelDisconnected(ctx: ChannelHandlerContext, e: ChannelStateEvent) = actor.stop()
+  override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) = actor ! e.getMessage
 }

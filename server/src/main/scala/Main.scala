@@ -1,5 +1,6 @@
 import Protocol.NetMessage
 import akka.actor.Actor
+import java.net.InetSocketAddress
 
 class Player extends Actor {
   override def preStart() = {
@@ -20,6 +21,6 @@ class Player extends Actor {
 }
 
 object Main extends App {
-  val server = new ProtoBroker
-  server.run[Player](NetMessage.getDefaultInstance)
+  val server = new ProtoBroker[NetMessage]
+  server.run[Player](new InetSocketAddress(14242))
 }
