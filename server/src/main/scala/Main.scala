@@ -3,21 +3,23 @@ import akka.actor.Actor
 
 class Player extends Actor {
   override def preStart() = {
-    println("connected")
+    println(self + " connected")
   }
 
   override def postStop() = {
-    println("disconnected")
+    println(self + " disconnected")
   }
   
   def receive = {
-    case msg: NetMessage => println("got netmessage " + msg.getType())
+    case msg: NetMessage =>
+      println(self + " received:")
+      println(msg)
+    
     case _ => println("recv unkown msg")
   }
 }
 
 object Main extends App {
-  val msg = NetMessage.getDefaultInstance
   val server = new ProtoBroker
   server.run[Player](NetMessage.getDefaultInstance)
 }
