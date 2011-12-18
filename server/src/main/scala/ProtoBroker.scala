@@ -57,7 +57,6 @@ import org.jboss.netty.channel.{
 }
 
 case class Connected()
-case class ReceivedMsg(msg: Object)  // TODO: make this one only receive the proper protobuf type
 
 class ChannelActorGlue(actor: ActorRef) extends SimpleChannelUpstreamHandler {
   override def channelConnected(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
@@ -69,6 +68,6 @@ class ChannelActorGlue(actor: ActorRef) extends SimpleChannelUpstreamHandler {
   }
 
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
-    actor ! ReceivedMsg(e.getMessage)
+    actor ! e.getMessage
   }
 }
