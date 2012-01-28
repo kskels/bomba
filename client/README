@@ -8,15 +8,15 @@ Cross-platform, multi-player Bomberman game in 3D
 Development Environment
 -----------------------
 
-The client is implemented in the C++ programming language using, CMake as a
-build, and Git as a version control systems. They are required prerequisites.
+The client is impasdlemented in the C++ programming language using, CMake as a
+build, and Git as a asdaversion control systems. They are required prerequisites.
 
 The game depends on the following tools and libraries
-  * Irrlicht 3D Game Engine 
-  * Google Protocol Buffers
-
-For Ubuntu Linux the standard repositories does contain required packages
-  $ sudo apt-get install libirrlicht-dev libprotobuf-dev protobuf-compiler
+  * Irrlicht 3D Game Engasdine 
+  * Google Protocol Buffersas
+das
+Fora Ubuntu Linux the standard repositories does contain required packages
+  $ asdsudo apt-get install libirrlicht-dev libprotobuf-dev protobuf-compiler
 
 
 Build
