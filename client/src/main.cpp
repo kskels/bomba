@@ -3,6 +3,7 @@
 #include <connection.h>
 #include <log.hpp> 
 #include <protocol.pb.h> // remove ugly .pb
+#include <event_receiver.hpp>
 
 #include <irrlicht/irrlicht.h>
 
@@ -13,6 +14,7 @@
 
 using namespace irr;
 
+EventReceiver _receiver;
 
 class GfxDevice {
 public:
@@ -108,6 +110,7 @@ IrrlichtDevice *createGfxDevice(int width, int height) {
   params.ZBufferBits = 16;
   params.Fullscreen = false;
   params.Vsync = params.Fullscreen;
+  params.EventReceiver = &_receiver;
   
   std::string title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." + 
     + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
@@ -131,8 +134,8 @@ int main() {
   std::auto_ptr<HiDevice> hid(createHiDevice());
   TileMap map;
 
-  Connection client;
-  client.connect("localhost");
+  //Connection client;
+  //client.connect("localhost");
 
   do {
     Log(DEBUG) << "Sending an initial position update";
@@ -146,7 +149,7 @@ int main() {
     message.set_type(NetMessage::POSITION_UPDATE);
     *(message.mutable_player_position()) = position;
 
-    client.send(message);
+    //client.send(message);
   } while (false);
 
   EntityMap entities;
@@ -158,96 +161,105 @@ int main() {
   double time = 0.0;
   unsigned long frame = 0;
 
-  Log(INFO) << "Watch out, entering the main loop..";  
-  while (running) {
-    video::IVideoDriver *video = gfx->getVideoDriver();    
-    video->beginScene(true, true, video::SColor(255, 100, 101, 140));
-    
-    if (client.state() == Connection::CONNECTED) {
-      // receive network messages and update game state according to events
-      NetMessage msg;
-      while (client >> msg) {
-        Log(INFO) << "received msg of type " << msg.type();
-		
-        switch (msg.type()) {
-        case NetMessage::POSITION_UPDATE: {
-          const PositionUpdate &pos = msg.player_position();
-          const EntityId eid = static_cast<EntityId>(pos.entity());
-          
-          EntityMap::iterator iter = entities.find(eid);
-          if (iter != entities.end()) {
-            iter->second->onNetUpdate(pos);
-          }
-          else if (eid != 0) {
-            Entity *entity = new ProxyEntity;
-            entity->onNetUpdate(pos);
-            entities[eid] = entity;         
-          }
-          
-          break;
-        }
-          
-        case NetMessage::MAP_DATA:
-          map.assign(msg.map());
-          break;
-          
-        case NetMessage::PLAYER_INFO:
-          localPlayer = static_cast<EntityId>(msg.player_info().local_id());
-          break;
-        }
-      }
-      
-      // read user input and pass it to the local player's entity
-      HiDevice::Input input;
-      if (hid->read(input)) {
-        if (input.escapePressed) {
-          running = false;
-        }
-        
-        if (localPlayer) {
-          EntityMap::iterator iter = entities.find(localPlayer);
-          if (iter != entities.end()) {
-            iter->second->onInput(input);
-          }
-        }
-      }
-      
-      // update state of entities
-      for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
-        iter->second->update(time);
-      }
-      
-      map.render(gfx.get(), time);
-      
-      // render entities according to internal state
-      for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
-        iter->second->render(gfx.get(), time);
-      }
+  while(gfx->run()) {
+    if(_receiver.isKeyDown(irr::KEY_ESCAPE)) {
+      Log(INFO) << "Escape received => closing down the device";
+      gfx->closeDevice();
     }
-    else if (client.state() == Connection::CONNECTING) {
-      //gfx->drawMessage("Connecting...");
-    }
-    else {
-      localPlayer = 0;
-
-      if (font) {
-        font->draw(L"Disconnected.",
-                   core::rect<s32>(130,10,300,50),
-                   video::SColor(255,255,255,255));
-      }
-      
-      /*         lobby->update(currentTime, hid);
-                 lobby->draw(currentTime);
-                 if (lobby->state().key == GuiScreen::STATE_CONNECT) { // this could be reversed, dip.
-                 client.connect(lobby->state().value);
-                 lobby->resetState();
-                 }*/
-      
-    }
-    
-    ++frame;
-    video->endScene();
   }
+
+
+  //Log(INFO) << "Watch out, entering the main loop..";  
+  // while (running) {
+  //   video::IVideoDriver *video = gfx->getVideoDriver();    
+  //   video->beginScene(true, true, video::SColor(255, 100, 101, 140));
+  //   
+  //   if (client.state() == Connection::CONNECTED) {
+  //     // receive network messages and update game state according to events
+  //     NetMessage msg;
+  //     while (client >> msg) {
+  //       Log(INFO) << "received msg of type " << msg.type();
+  //   	
+  //       switch (msg.type()) {
+  //       case NetMessage::POSITION_UPDATE: {
+  //         const PositionUpdate &pos = msg.player_position();
+  //         const EntityId eid = static_cast<EntityId>(pos.entity());
+  //         
+  //         EntityMap::iterator iter = entities.find(eid);
+  //         if (iter != entities.end()) {
+  //           iter->second->onNetUpdate(pos);
+  //         }
+  //         else if (eid != 0) {
+  //           Entity *entity = new ProxyEntity;
+  //           entity->onNetUpdate(pos);
+  //           entities[eid] = entity;         
+  //         }
+  //         
+  //         break;
+  //       }
+  //         
+  //       case NetMessage::MAP_DATA:
+  //         map.assign(msg.map());
+  //         break;
+  //         
+  //       case NetMessage::PLAYER_INFO:
+  //         localPlayer = static_cast<EntityId>(msg.player_info().local_id());
+  //         break;
+  //       }
+  //     }
+  //     
+  //     // read user input and pass it to the local player's entity
+  //     HiDevice::Input input;
+  //     if (hid->read(input)) {
+  //       if (input.escapePressed) {
+  //         running = false;
+  //       }
+  //       
+  //       if (localPlayer) {
+  //         EntityMap::iterator iter = entities.find(localPlayer);
+  //         if (iter != entities.end()) {
+  //           iter->second->onInput(input);
+  //         }
+  //       }
+  //     }
+  //     
+  //     // update state of entities
+  //     for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
+  //       iter->second->update(time);
+  //     }
+  //     
+  //     map.render(gfx.get(), time);
+  //     
+  //     // render entities according to internal state
+  //     for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
+  //       iter->second->render(gfx.get(), time);
+  //     }
+  //   }
+  //   else if (client.state() == Connection::CONNECTING) {
+  //     //gfx->drawMessage("Connecting...");
+  //   }
+  //   else {
+  //     localPlayer = 0;
+
+  //     if (font) {
+  //       font->draw(L"Disconnected.",
+  //                  core::rect<s32>(130,10,300,50),
+  //                  video::SColor(255,255,255,255));
+  //     }
+  //     
+  //     /*         lobby->update(currentTime, hid);
+  //                lobby->draw(currentTime);
+  //                if (lobby->state().key == GuiScreen::STATE_CONNECT) { // this could be reversed, dip.
+  //                client.connect(lobby->state().value);
+  //                lobby->resetState();
+  //                }*/
+  //     
+  //   }
+  //   
+  //   ++frame;
+  //   video->endScene();
+  // }
+
   
 }
 
