@@ -181,9 +181,6 @@ int main()
     node->setMaterialFlag(video::EMF_LIGHTING, false);
   }
 
-  smgr->addCameraSceneNodeFPS();
-  gfx->getCursorControl()->setVisible(false);
-
   int lastFPS = -1;
 
   // In order to do framerate independent movement, we have to know
@@ -204,28 +201,16 @@ int main()
     const irr::f32 frameDeltaTime = (irr::f32)(now - then) / 1000.f;
     then = now;
 
-    irr::core::vector3df nodePosition = node->getPosition();
-
-    if(_receiver.isKeyDown(irr::KEY_KEY_W))
-      nodePosition.Y += MOVEMENT_SPEED * frameDeltaTime;
-    else if(_receiver.isKeyDown(irr::KEY_KEY_S))
-      nodePosition.Y -= MOVEMENT_SPEED * frameDeltaTime;
-
-    if(_receiver.isKeyDown(irr::KEY_KEY_A))
-      nodePosition.X -= MOVEMENT_SPEED * frameDeltaTime;
-    else if(_receiver.isKeyDown(irr::KEY_KEY_D))
-      nodePosition.X += MOVEMENT_SPEED * frameDeltaTime;
-
-    node->setPosition(nodePosition);
-
     driver->beginScene(true, true, video::SColor(255,113,113,133));
-    smgr->drawAll();
+
+    core::position2d<s32> m = gfx->getCursorControl()->getPosition();
+    driver->draw2DRectangle(video::SColor(100,255,255,255),
+                            core::rect<s32>(m.X-20, m.Y-20, m.X+20, m.Y+20));
     driver->endScene();
 
     int fps = driver->getFPS();
 
-    if (lastFPS != fps)
-    {
+    if (lastFPS != fps) {
       irr::core::stringw tmp(L"Movement Example - Irrlicht Engine [");
       tmp += L"] fps: ";
       tmp += fps;
