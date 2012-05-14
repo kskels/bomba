@@ -17,7 +17,7 @@
 using namespace irr;
 
 EventReceiver _receiver;
-std::string _title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." +
+std::string _title = std::string("Cineland ") + BUILD_VERSION_MAJOR + "." +
                      + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
 
 class GfxDevice
