@@ -191,10 +191,10 @@ int main()
   irr::u32 then = gfx->getTimer()->getTime();
 
   // This is the movemen speed in units per second.
-  const irr::f32 MOVEMENT_SPEED = 5.f;
+  const irr::f32 MOVEMENT_SPEED = 100.f;
 
   video::ITexture* image = driver->getTexture("../res/dalmatians.png");
-  //driver->makeColorKeyTexture(image, core::position2d<s32>(0,0));
+  video::ITexture* twin = driver->getTexture("../res/twin.png");
 
 
   while(gfx->run()) {
@@ -207,10 +207,29 @@ int main()
     const irr::f32 frameDeltaTime = (irr::f32)(now - then) / 1000.f;
     then = now;
 
+
+    irr::core::vector3df nodePosition = node->getPosition();
+    if(_receiver.isKeyDown(irr::KEY_KEY_W))
+      nodePosition.Y -= MOVEMENT_SPEED * frameDeltaTime;
+    else if(_receiver.isKeyDown(irr::KEY_KEY_S))
+      nodePosition.Y += MOVEMENT_SPEED * frameDeltaTime;
+
+    if(_receiver.isKeyDown(irr::KEY_KEY_A))
+      nodePosition.X -= MOVEMENT_SPEED * frameDeltaTime;
+    else if(_receiver.isKeyDown(irr::KEY_KEY_D))
+      nodePosition.X += MOVEMENT_SPEED * frameDeltaTime;
+
+    node->setPosition(nodePosition);
+
+
     driver->beginScene(true, true, video::SColor(255,113,113,133));
 
     driver->draw2DImage(image, core::position2d<s32>(0,0),
                         core::rect<s32>(0,0,800,600), 0,
+                        video::SColor(255,255,255,255), true);
+
+    driver->draw2DImage(twin, core::position2d<s32>(nodePosition.X,nodePosition.Y),
+                        core::rect<s32>(0,0,120,180), 0,
                         video::SColor(255,255,255,255), true);
 
 
