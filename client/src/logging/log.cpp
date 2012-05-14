@@ -36,9 +36,9 @@ Log::ToCoutConsumer::ToCoutConsumer() : _severity(SEVERITY_DEBUG) {
 
 void Log::ToCoutConsumer::operator()(Log::Severity severity, 
   const std::string &line) {
-  if (_severity > severity) {
+  //if (_severity > severity) {
     std::cout << line << std::endl;
-  }
+  //}
 }
 
 Log::ToFileConsumer::ToFileConsumer(const std::string &path) : _severity(SEVERITY_DEBUG), _path(path) {

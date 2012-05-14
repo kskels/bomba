@@ -5,7 +5,7 @@
 EventReceiver::EventReceiver()
 {
   Log(DEBUG) << "";
-  for(unsigned i(0); i != irr::KEY_KEY_CODES_COUNT; ++i) {
+  for(irr::u32 i(0); i != irr::KEY_KEY_CODES_COUNT; ++i) {
     _keyIsDown[i] = false;
   }
 }

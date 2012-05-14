@@ -1,7 +1,7 @@
 
 #include <config.h>
 #include <connection.h>
-#include <log.hpp> 
+#include <log.hpp>
 #include <protocol.pb.h> // remove ugly .pb
 #include <event_receiver.hpp>
 
@@ -16,7 +16,8 @@ using namespace irr;
 
 EventReceiver _receiver;
 
-class GfxDevice {
+class GfxDevice
+{
 public:
   virtual ~GfxDevice() {}
 
@@ -25,24 +26,29 @@ public:
   void drawMessage(const char *) {}
 };
 
-class HiDevice {
+class HiDevice
+{
 public:
   struct Input {
     bool escapePressed;
   };
 
   virtual ~HiDevice() {}
-  
-  Input *read(Input &) const {return 0; }
+
+  Input *read(Input &) const {
+    return 0;
+  }
 };
 
-class TileMap {
+class TileMap
+{
 public:
   void assign(const MapData &data) {}
   void render(IrrlichtDevice *gfx, double time) {}
 };
 
-class Entity {
+class Entity
+{
 public:
   virtual ~Entity() {}
 
@@ -56,29 +62,29 @@ public:
  * A proxy entity can be used to store delta packets even though
  * we don't have the complete definition of the entity yet.
  */
-class ProxyEntity : public Entity {
+class ProxyEntity : public Entity
+{
 public:
   ProxyEntity() {
     _delegate = 0;
   }
-  
+
   void onNetUpdate(const PositionUpdate &packet) {
     if (_delegate) _delegate->onNetUpdate(packet);
   }
-  
+
   void onInput(const HiDevice::Input &input) {
     if (_delegate) _delegate->onInput(input);
   }
-  
+
   void update(double time) {
     if (_delegate) _delegate->update(time);
   }
-  
+
   void render(IrrlichtDevice *gfx, double time) const {
     if (_delegate) {
       _delegate->render(gfx, time);
-    }
-    else {
+    } else {
       // render placeholder: gfx->drawBox(1, 1, 1, pos)
     }
   }
@@ -91,14 +97,15 @@ public:
       // _delegate->onNetUpdate(storedUpdate);
     }
   }
-  
+
 private:
   Entity *_delegate; // TODO: smartptr
 };
 
-IrrlichtDevice *createGfxDevice(int width, int height) {
+IrrlichtDevice *createGfxDevice(int width, int height)
+{
   using core::dimension2d;
-  
+
   SIrrlichtCreationParameters params;
   params.AntiAlias = true;
   params.WithAlphaChannel = true;
@@ -111,9 +118,9 @@ IrrlichtDevice *createGfxDevice(int width, int height) {
   params.Fullscreen = false;
   params.Vsync = params.Fullscreen;
   params.EventReceiver = &_receiver;
-  
-  std::string title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." + 
-    + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
+
+  std::string title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." +
+                      + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
   std::wstring capt;
   capt.assign(title.begin(), title.end());
 
@@ -122,15 +129,19 @@ IrrlichtDevice *createGfxDevice(int width, int height) {
   return device.release();
 }
 
-HiDevice *createHiDevice() {return new HiDevice; }
+HiDevice *createHiDevice()
+{
+  return new HiDevice;
+}
 
-int main() {
+int main()
+{
   Log::registerConsumer(Log::ToCoutConsumer());
 
   typedef unsigned EntityId;
   typedef std::map<EntityId, Entity *> EntityMap;
-  
-  std::auto_ptr<IrrlichtDevice> gfx(createGfxDevice(320, 240));
+
+  std::auto_ptr<IrrlichtDevice> gfx(createGfxDevice(640, 480));
   std::auto_ptr<HiDevice> hid(createHiDevice());
   TileMap map;
 
@@ -139,7 +150,7 @@ int main() {
 
   do {
     Log(DEBUG) << "Sending an initial position update";
-    
+
     PositionUpdate position;
     position.set_entity(1);
     position.set_x(2);
@@ -155,36 +166,93 @@ int main() {
   EntityMap entities;
 
   gui::IGUIFont *font = gfx->getGUIEnvironment()->getBuiltInFont();
-  
+
   EntityId localPlayer = 0;
   bool running = true;
   double time = 0.0;
   unsigned long frame = 0;
+
+  video::IVideoDriver* driver = gfx->getVideoDriver();
+  scene::ISceneManager* smgr = gfx->getSceneManager();
+
+  irr::scene::ISceneNode* node = smgr->addSphereSceneNode();
+  if (node) {
+    node->setPosition(core::vector3df(0,0,30));
+    node->setMaterialFlag(video::EMF_LIGHTING, false);
+  }
+
+  smgr->addCameraSceneNodeFPS();
+  gfx->getCursorControl()->setVisible(false);
+
+  int lastFPS = -1;
+
+  // In order to do framerate independent movement, we have to know
+  // how long it was since the last frame
+  irr::u32 then = gfx->getTimer()->getTime();
+
+  // This is the movemen speed in units per second.
+  const irr::f32 MOVEMENT_SPEED = 5.f;
+
 
   while(gfx->run()) {
     if(_receiver.isKeyDown(irr::KEY_ESCAPE)) {
       Log(INFO) << "Escape received => closing down the device";
       gfx->closeDevice();
     }
+
+    const irr::u32 now = gfx->getTimer()->getTime();
+    const irr::f32 frameDeltaTime = (irr::f32)(now - then) / 1000.f;
+    then = now;
+
+    irr::core::vector3df nodePosition = node->getPosition();
+
+    if(_receiver.isKeyDown(irr::KEY_KEY_W))
+      nodePosition.Y += MOVEMENT_SPEED * frameDeltaTime;
+    else if(_receiver.isKeyDown(irr::KEY_KEY_S))
+      nodePosition.Y -= MOVEMENT_SPEED * frameDeltaTime;
+
+    if(_receiver.isKeyDown(irr::KEY_KEY_A))
+      nodePosition.X -= MOVEMENT_SPEED * frameDeltaTime;
+    else if(_receiver.isKeyDown(irr::KEY_KEY_D))
+      nodePosition.X += MOVEMENT_SPEED * frameDeltaTime;
+
+    node->setPosition(nodePosition);
+
+    driver->beginScene(true, true, video::SColor(255,113,113,133));
+    smgr->drawAll();
+    driver->endScene();
+
+    int fps = driver->getFPS();
+
+    if (lastFPS != fps)
+    {
+      irr::core::stringw tmp(L"Movement Example - Irrlicht Engine [");
+      tmp += L"] fps: ";
+      tmp += fps;
+
+      gfx->setWindowCaption(tmp.c_str());
+      lastFPS = fps;
+    }
+
   }
 
 
-  //Log(INFO) << "Watch out, entering the main loop..";  
+  //Log(INFO) << "Watch out, entering the main loop..";
   // while (running) {
-  //   video::IVideoDriver *video = gfx->getVideoDriver();    
+  //   video::IVideoDriver *video = gfx->getVideoDriver();
   //   video->beginScene(true, true, video::SColor(255, 100, 101, 140));
-  //   
+  //
   //   if (client.state() == Connection::CONNECTED) {
   //     // receive network messages and update game state according to events
   //     NetMessage msg;
   //     while (client >> msg) {
   //       Log(INFO) << "received msg of type " << msg.type();
-  //   	
+  //
   //       switch (msg.type()) {
   //       case NetMessage::POSITION_UPDATE: {
   //         const PositionUpdate &pos = msg.player_position();
   //         const EntityId eid = static_cast<EntityId>(pos.entity());
-  //         
+  //
   //         EntityMap::iterator iter = entities.find(eid);
   //         if (iter != entities.end()) {
   //           iter->second->onNetUpdate(pos);
@@ -192,29 +260,29 @@ int main() {
   //         else if (eid != 0) {
   //           Entity *entity = new ProxyEntity;
   //           entity->onNetUpdate(pos);
-  //           entities[eid] = entity;         
+  //           entities[eid] = entity;
   //         }
-  //         
+  //
   //         break;
   //       }
-  //         
+  //
   //       case NetMessage::MAP_DATA:
   //         map.assign(msg.map());
   //         break;
-  //         
+  //
   //       case NetMessage::PLAYER_INFO:
   //         localPlayer = static_cast<EntityId>(msg.player_info().local_id());
   //         break;
   //       }
   //     }
-  //     
+  //
   //     // read user input and pass it to the local player's entity
   //     HiDevice::Input input;
   //     if (hid->read(input)) {
   //       if (input.escapePressed) {
   //         running = false;
   //       }
-  //       
+  //
   //       if (localPlayer) {
   //         EntityMap::iterator iter = entities.find(localPlayer);
   //         if (iter != entities.end()) {
@@ -222,14 +290,14 @@ int main() {
   //         }
   //       }
   //     }
-  //     
+  //
   //     // update state of entities
   //     for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
   //       iter->second->update(time);
   //     }
-  //     
+  //
   //     map.render(gfx.get(), time);
-  //     
+  //
   //     // render entities according to internal state
   //     for (EntityMap::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
   //       iter->second->render(gfx.get(), time);
@@ -246,20 +314,20 @@ int main() {
   //                  core::rect<s32>(130,10,300,50),
   //                  video::SColor(255,255,255,255));
   //     }
-  //     
+  //
   //     /*         lobby->update(currentTime, hid);
   //                lobby->draw(currentTime);
   //                if (lobby->state().key == GuiScreen::STATE_CONNECT) { // this could be reversed, dip.
   //                client.connect(lobby->state().value);
   //                lobby->resetState();
   //                }*/
-  //     
+  //
   //   }
-  //   
+  //
   //   ++frame;
   //   video->endScene();
   // }
 
-  
+  return 0;
 }
 
