@@ -11,10 +11,14 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <sstream>
+#include <iostream>
 
 using namespace irr;
 
 EventReceiver _receiver;
+std::string _title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." +
+                     + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
 
 class GfxDevice
 {
@@ -119,10 +123,9 @@ IrrlichtDevice *createGfxDevice(int width, int height)
   params.Vsync = params.Fullscreen;
   params.EventReceiver = &_receiver;
 
-  std::string title = std::string("Bomba ") + BUILD_VERSION_MAJOR + "." +
-                      + BUILD_VERSION_MINOR + "." + BUILD_VERSION_REVISION;
+
   std::wstring capt;
-  capt.assign(title.begin(), title.end());
+  capt.assign(_title.begin(), _title.end());
 
   std::auto_ptr<IrrlichtDevice> device(createDeviceEx(params));
   device->setWindowCaption(capt.c_str());
@@ -141,7 +144,7 @@ int main()
   typedef unsigned EntityId;
   typedef std::map<EntityId, Entity *> EntityMap;
 
-  std::auto_ptr<IrrlichtDevice> gfx(createGfxDevice(640, 480));
+  std::auto_ptr<IrrlichtDevice> gfx(createGfxDevice(800, 600));
   std::auto_ptr<HiDevice> hid(createHiDevice());
   TileMap map;
 
@@ -190,6 +193,9 @@ int main()
   // This is the movemen speed in units per second.
   const irr::f32 MOVEMENT_SPEED = 5.f;
 
+  video::ITexture* image = driver->getTexture("../res/dalmatians.png");
+  driver->makeColorKeyTexture(image, core::position2d<s32>(0,0));
+
 
   while(gfx->run()) {
     if(_receiver.isKeyDown(irr::KEY_ESCAPE)) {
@@ -203,6 +209,11 @@ int main()
 
     driver->beginScene(true, true, video::SColor(255,113,113,133));
 
+    driver->draw2DImage(image, core::position2d<s32>(0,0),
+                        core::rect<s32>(0,0,800,600), 0,
+                        video::SColor(255,255,255,255), true);
+
+
     core::position2d<s32> m = gfx->getCursorControl()->getPosition();
     driver->draw2DRectangle(video::SColor(100,255,255,255),
                             core::rect<s32>(m.X-20, m.Y-20, m.X+20, m.Y+20));
@@ -211,14 +222,14 @@ int main()
     int fps = driver->getFPS();
 
     if (lastFPS != fps) {
-      irr::core::stringw tmp(L"Movement Example - Irrlicht Engine [");
-      tmp += L"] fps: ";
-      tmp += fps;
-
-      gfx->setWindowCaption(tmp.c_str());
+      std::stringstream ss;
+      ss << _title << " [fps: " << fps << "]";
+      std::string tmp = ss.str();
+      std::wstring capt;
+      capt.assign(tmp.begin(), tmp.end());
+      gfx->setWindowCaption(capt.c_str());
       lastFPS = fps;
     }
-
   }
 
 

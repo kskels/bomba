@@ -16,7 +16,7 @@ The game depends on the following tools and libraries
   * Google Protocol Buffers
 das
 Fora Ubuntu Linux the standard repositories does contain required packages
-  $ asdsudo apt-get install libirrlicht-dev libprotobuf-dev protobuf-compiler
+  $ sudo apt-get install libirrlicht-dev libprotobuf-dev protobuf-compiler
 
 
 Build
