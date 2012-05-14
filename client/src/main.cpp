@@ -194,7 +194,7 @@ int main()
   const irr::f32 MOVEMENT_SPEED = 5.f;
 
   video::ITexture* image = driver->getTexture("../res/dalmatians.png");
-  driver->makeColorKeyTexture(image, core::position2d<s32>(0,0));
+  //driver->makeColorKeyTexture(image, core::position2d<s32>(0,0));
 
 
   while(gfx->run()) {
